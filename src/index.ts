@@ -126,22 +126,16 @@ function handleFolder(targetFolder: string) {
     
     let msPairs: MSPairs = {};
 
-    // function getFnameWithoutExt(fileName: string): string {
-    //     return path.basename(fileName).split('.')[0];
-    // }
-
     fItems.forEach((item: FItem) => {
         let base = path.parse(item.short).name;
-        
         if (item.ext === fnames.extType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
-        }
-        else
-        if (item.ext === fnames.extType.srt) {
+        } else if (item.ext === fnames.extType.srt) {
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
-        
     });
+
+    (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
 
     console.log(`msPairs ${JSON.stringify(msPairs, null, 4)}`);
 }
