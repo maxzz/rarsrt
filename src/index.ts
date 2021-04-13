@@ -4,6 +4,7 @@ import { execSync } from 'child_process';
 import chalk from 'chalk';
 import { exist, fnames } from './os-utils';
 import { exitProcess, help, newErrorArgs, notes } from './process-utils';
+import rimraf from 'rimraf';
 
 namespace osStuff {
 
@@ -66,13 +67,13 @@ namespace appUtils {
     
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         // -y is to overwrite destination file.
-        // -loglevel quiet is to reduce console output, but still will show errors.
-        // if file already has subtitles it will overwrite existing, i.e. not duplicate.
-        
+        // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
+        // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
+
         let cmd = `"${FFMPEG}" -y -loglevel quiet -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
         try {
             execSync(cmd);
-            // console.log('cmd', cmd);
+            //console.log('cmd', cmd);
         } catch (error) {
             throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nError:\n${error.message}\n`);
         }
@@ -143,11 +144,16 @@ function handleFolder(targetFolder: string) {
         let srt = path.join(targetFolder, `${names[1].srt}`);
         let out = path.join(targetFolder, `${names[0]},,,tm,,,.mp4`); // TODO: check filename length < 255
         appUtils.createFileMp4WithSrt(mp4, srt, out);
+
+        // Remove .srt, .mp4 files and rename the new file wo/ ',,,tm,,,' suffix.
+        rimraf.sync(srt);
+        rimraf.sync(mp4);
+        fs.renameSync(out, mp4);
     });
 
     //TODO: .srt, .mp4 files and rename, and remove ,,,tm,,, suffix.
 
-    console.log(`final ${JSON.stringify(final, null, 4)}`);
+    //console.log(`final ${JSON.stringify(final, null, 4)}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[] } {
