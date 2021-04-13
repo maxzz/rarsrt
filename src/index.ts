@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
-import { exist } from './os-utils';
+import { exist, fnames } from './os-utils';
 import { exitProcess, help, newErrorArgs, notes } from './process-utils';
 
 namespace osStuff {
@@ -106,8 +106,44 @@ function handleFiles(filesToRar: string[]): void {
 */    
 }
 
-function handleFolder(dir: string) {
+function handleFolder(targetFolder: string) {
+    // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
 
+    // 1. Get folders and files inside the target folder.
+    let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
+
+    // 2. Get what we have inside this folder.
+    type FItem = osStuff.fileItem & { ext: fnames.extType };
+
+    let fItems: FItem[] = filesAndFolders.files.map((_: osStuff.fileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
+
+    type MSPair = { // mp4 and srt pair
+        mp4?: string;
+        srt?: string;
+    }
+
+    type MSPairs = Record<string, MSPair>;
+    
+    let msPairs: MSPairs = {};
+
+    // function getFnameWithoutExt(fileName: string): string {
+    //     return path.basename(fileName).split('.')[0];
+    // }
+
+    fItems.forEach((item: FItem) => {
+        let base = path.parse(item.short).name;
+        
+        if (item.ext === fnames.extType.mp4) {
+            (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
+        }
+        else
+        if (item.ext === fnames.extType.srt) {
+            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
+        }
+        
+    });
+
+    console.log(`msPairs ${JSON.stringify(msPairs, null, 4)}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[] } {
@@ -157,19 +193,8 @@ async function main() {
         }
     }
 
-    console.log(`targets ${JSON.stringify(targets, null, 4)}`);
-    await exitProcess(0, '');
-    /*
-        targets {
-            "files": [
-                "C:\\Y\\w\\1-node\\1-utils\\merge-video-subtitles\\tsconfig.json"
-            ],
-            "dirs": [
-                "C:\\Y\\w\\1-node\\1-utils\\merge-video-subtitles\\tests",
-                "C:\\Y\\w\\1-node\\1-utils\\merge-video-subtitles\\src"
-            ]
-        }    
-    */
+    // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
+    // await exitProcess(0, '');
 
     if (targets.files.length) {
         handleFiles([...targets.files, ...targets.dirs]); // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
