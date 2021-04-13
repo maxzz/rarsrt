@@ -67,7 +67,7 @@ namespace appUtils {
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         let cmd = `"${FFMPEG}" -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
         try {
-            //execSync(cmd);
+            execSync(cmd);
             console.log('cmd', cmd);
         } catch (error) {
             throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n${error.message}\n`);
@@ -127,7 +127,8 @@ function handleFolder(targetFolder: string) {
         if (item.ext === fnames.extType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
         } else if (item.ext === fnames.extType.srt) {
-            (msPairs[base] || (msPairs[base] = {})).srt = item.short; // TODO: handle name.en.srt
+            base = base.replace(/\.en$/, ''); // handle case: 'name.en.srt'
+            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
     });
 
@@ -140,7 +141,7 @@ function handleFolder(targetFolder: string) {
         appUtils.createFileMp4WithSrt(mp4, srt, out);
     });
 
-    //TODO: remove: ,,,tm,,,
+    //TODO: remove: ,,,tm,,, suffix and .srt file
 
     console.log(`final ${JSON.stringify(final, null, 4)}`);
 }
