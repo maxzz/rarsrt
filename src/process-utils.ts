@@ -35,9 +35,9 @@ export function newErrorArgs(msg: string): ErrorArgs {
 
 export function help() {
     let help = `
-${chalk.cyan('mergesubs')} utility will move a folder metadata to tm.rar file. Metadata are .mht and .url files.
+${chalk.cyan('mergesubs')} utility will combine .SRT subtitles with .MP4 files inside specified folders..
 Version ${cfg.version}
-Usage: mergesubs <file> | <folder(s)>`;
+Usage: mergesubs <file(s).mp4> | <folder(s)>`;
     console.log(help);
 }
 
