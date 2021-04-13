@@ -65,7 +65,6 @@ namespace appUtils {
     let FFMPEG: string;
     
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
-
         let cmd = `"${FFMPEG}" -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
         try {
             //execSync(cmd);
@@ -128,14 +127,22 @@ function handleFolder(targetFolder: string) {
         if (item.ext === fnames.extType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
         } else if (item.ext === fnames.extType.srt) {
-            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
+            (msPairs[base] || (msPairs[base] = {})).srt = item.short; // TODO: handle name.en.srt
         }
     });
 
     // Now make only names: ["01 - Introduction", ...]
-    let res = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt).map((arrPair) => arrPair[0]);
+    let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
+    final.forEach((names) => {
+        let mp4 = path.join(targetFolder, `${names[1].mp4}`);
+        let srt = path.join(targetFolder, `${names[1].srt}`);
+        let out = path.join(targetFolder, `${names[0]},,,tm,,,.mp4`); // TODO: check filename length < 255
+        appUtils.createFileMp4WithSrt(mp4, srt, out);
+    });
 
-    console.log(`res ${JSON.stringify(res, null, 4)}`);
+    //TODO: remove: ,,,tm,,,
+
+    console.log(`final ${JSON.stringify(final, null, 4)}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[] } {
