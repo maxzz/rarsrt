@@ -64,17 +64,14 @@ namespace appUtils {
 
     let FFMPEG: string;
     
-    export function createFileMp4WithSrt(fullNameRar: string, baseFolderForShortNames: string, shortNamesToRar: string[]) {
-        if (!shortNamesToRar.length) {
-            throw new Error(`No files to move into ${fullNameRar}`);
-        }
-    
-        let names = shortNamesToRar.map(_ => `"${_}"`).join(' ');
-        let cmd = `"${FFMPEG}" m \"${fullNameRar}\" ${names}`; // Don't use 'start', it will spawn new process and we receive closed handle of start not winrar.
+    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
+
+        let cmd = `"${FFMPEG}" -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
         try {
-            execSync(cmd, {cwd: baseFolderForShortNames});
+            //execSync(cmd);
+            console.log('cmd', cmd);
         } catch (error) {
-            throw new Error(`Failed to create ${fullNameRar}\n${error.message}\n`);
+            throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n${error.message}\n`);
         }
     }
 
@@ -135,9 +132,10 @@ function handleFolder(targetFolder: string) {
         }
     });
 
-    (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
+    // Now make only names: ["01 - Introduction", ...]
+    let res = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt).map((arrPair) => arrPair[0]);
 
-    console.log(`msPairs ${JSON.stringify(msPairs, null, 4)}`);
+    console.log(`res ${JSON.stringify(res, null, 4)}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[] } {
