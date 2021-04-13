@@ -65,10 +65,14 @@ namespace appUtils {
     let FFMPEG: string;
     
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
-        let cmd = `"${FFMPEG}" -y -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
+        // -y is to overwrite destination file.
+        // -loglevel quiet is to reduce console output, but still will show errors.
+        // if file already has subtitles it will overwrite existing, i.e. not duplicate.
+        
+        let cmd = `"${FFMPEG}" -y -loglevel quiet -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
         try {
             execSync(cmd);
-            console.log('cmd', cmd);
+            // console.log('cmd', cmd);
         } catch (error) {
             throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nError:\n${error.message}\n`);
         }
@@ -141,7 +145,6 @@ function handleFolder(targetFolder: string) {
         appUtils.createFileMp4WithSrt(mp4, srt, out);
     });
 
-    //TODO: check if destination file exist.
     //TODO: .srt, .mp4 files and rename, and remove ,,,tm,,, suffix.
 
     console.log(`final ${JSON.stringify(final, null, 4)}`);
