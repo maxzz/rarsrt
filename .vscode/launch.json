@@ -15,7 +15,8 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "args": ["tests"]
+            "args": ["tests"],
+            "console": "externalTerminal"
         }
     ]
 }
