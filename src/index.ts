@@ -206,6 +206,8 @@ async function main() {
     // await exitProcess(0, '');
 
     if (targets.files.length) {
+        notes.add('Separate handling of filenames has not yet been implemented.');
+        
         handleFiles([...targets.files, ...targets.dirs]); // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
     } else if (targets.dirs.length) {
         for (let dir of targets.dirs) {
@@ -220,12 +222,14 @@ async function main() {
             let rootDir = path.dirname(targets.dirs[0]);
             console.log(chalk.blueBright(`Processing root:\n${rootDir}\n`));
         }
+        //TODO: else [...targets.files, ...targets.dirs] 
     }
 
     notes.show();
 }
 
 main().catch(async (error) => {
-    error.args && help(); // Show help if args are invalid
-    await exitProcess(1, `${notes.buildMessage()}${chalk[error.args ? 'yellow' : 'red'](`\n${error.message}`)}`);
+    error.args && help(); // Show help only if arguments are invalid.
+    let errorMsg = `${notes.buildMessage()}${chalk[error.args ? 'yellow' : 'red'](`\n${error.message}`)}`;
+    await exitProcess(1, errorMsg);
 });
