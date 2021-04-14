@@ -157,6 +157,7 @@ function handleFolder(targetFolder: string) {
         let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
         if (srt.length > 248) {
+            notes.flushProcessed();
             printFilenameLength(targetFolder, final);
             throw Error(`The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
         }
