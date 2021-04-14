@@ -1,6 +1,6 @@
 {
     "name": "merge-subtitles",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "author": "Max Zakharzhevskiy",
     "description": "Utility to combine .SRT subtitles with .MP4 files inside specified folders.",
     "license": "MIT",

@@ -109,6 +109,7 @@ function handleFiles(filesToRar: string[]): void {
 
 function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
+    let lastFolder = path.basename(targetFolder) || targetFolder;
 
     // 1. Get folders and files inside the target folder.
     let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
@@ -151,7 +152,7 @@ function handleFolder(targetFolder: string) {
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
     final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
 
-    notes.addProcessed(`    ${targetFolder}${final.length ? ` ${final.length}` : ' <- skipped'}`);
+    notes.addProcessed(`    ${lastFolder}${final.length ? ` (${final.length})` : ' <- skipped'}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
@@ -212,6 +213,13 @@ async function main() {
         }
     } else {
         throw newErrorArgs(`Specify at leats one folder or files name to process`);
+    }
+
+    if (notes.willShow()) {
+        if (targets.dirs.length) {
+            let rootDir = path.dirname(targets.dirs[0]);
+            console.log(chalk.blueBright(`Processing root:\n${rootDir}\n`));
+        }
     }
 
     notes.show();

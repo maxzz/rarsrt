@@ -60,6 +60,10 @@ export namespace notes {
         return f ? `mergesubs finished\n\n${f}` : '';
     }
 
+    export function willShow(): boolean {
+        return processed.length > 1 || !!messages.length;
+    }
+
     export async function show(): Promise<void> {
         let final = buildMessage();
         if (final) {
