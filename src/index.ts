@@ -152,7 +152,9 @@ function handleFolder(targetFolder: string) {
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
     final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
 
-    notes.addProcessed(`    ${lastFolder}${final.length ? ` (${final.length})` : ' <- skipped'}`);
+    // notes.addProcessed(`     ${`(${final.length})`.padStart(7, ' ')}: ${lastFolder}`);
+    // notes.addProcessed(`     ${'skipped'}: ${lastFolder}`);
+    notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
