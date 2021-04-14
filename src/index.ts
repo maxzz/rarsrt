@@ -137,22 +137,21 @@ function handleFolder(targetFolder: string) {
         }
     });
 
-    let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
-    final.forEach(([name, pair]) => {
-        let mp4 = path.join(targetFolder, `${pair.mp4}`);
-        let srt = path.join(targetFolder, `${pair.srt}`);
-        let out = path.join(targetFolder, `${name},,,tm,,,.mp4`); // TODO: check filename length < 255
+    const oneFileAction = (targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) => {
+        let mp4 = path.join(targetFolder, `${shortMp4}`);
+        let srt = path.join(targetFolder, `${shortSrt}`);
+        let out = path.join(targetFolder, `${shortOut},,,tm,,,.mp4`); // TODO: check filename length < 255
         appUtils.createFileMp4WithSrt(mp4, srt, out);
 
-        // Remove .srt, .mp4 files and rename the new file wo/ ',,,tm,,,' suffix.
         rimraf.sync(srt);
         rimraf.sync(mp4);
-        fs.renameSync(out, mp4);
-    });
+        fs.renameSync(out, mp4); // Remove .srt, .mp4 files and rename the new file wo/ ',,,tm,,,' suffix.
+    };
 
-    //TODO: .srt, .mp4 files and rename, and remove ,,,tm,,, suffix.
+    let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
+    final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
 
-    //console.log(`final ${JSON.stringify(final, null, 4)}`);
+    notes.addProcessed(`    ${targetFolder}${final.length ? ` ${final.length}` : ' <- skipped'}`);
 }
 
 function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
