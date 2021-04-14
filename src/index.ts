@@ -138,12 +138,21 @@ function handleFolder(targetFolder: string) {
         }
     });
 
-    const oneFileAction = (targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) => {
+    function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
+        console.log(`\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long.\nThe lengths of the filenames in the folder:\n\n${targetFolder}\n`);
+        final.forEach(([name, pair]) => {
+            let s = path.join(targetFolder, `${pair.srt}`);
+            console.log(`    ${`${s.length}`.padStart(7, ' ')}: ${pair.srt}`);
+        });
+    }
+
+    function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `${shortOut}.mp0`); // TODO: check filename length < 255
+        let out = path.join(targetFolder, `${shortOut}.mp0`);
 
         if (srt.length > 248) {
+            printFilenameLength(targetFolder, final);
             throw Error(`The filename is too long (${srt.length}):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 255} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
         }
 
@@ -152,7 +161,7 @@ function handleFolder(targetFolder: string) {
         rimraf.sync(srt);
         rimraf.sync(mp4);
         fs.renameSync(out, mp4);
-    };
+    }
 
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
     final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
