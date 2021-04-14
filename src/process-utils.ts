@@ -53,19 +53,19 @@ export namespace notes {
         processed.push(note);
     }
 
-    export function buildMessage(): string {
+    export function buildMessage(showFinished: boolean = true): string {
         let p = processed.length > 1 ? chalk.blueBright(`Processed:\n${processed.join('\n')}\n`) : '';
         let s = messages.length ? chalk.yellow(`\nNotes:\n${messages.join('\n')}\n`) : '';
         let f = `${p}${s}`;
-        return f ? `mergesubs finished\n\n${f}` : '';
+        return f ? showFinished ? `mergesubs finished\n\n${f}` : f : '';
     }
 
     export function willShow(): boolean {
         return processed.length > 1 || !!messages.length;
     }
 
-    export async function show(): Promise<void> {
-        let final = buildMessage();
+    export async function show(showFinished: boolean = true): Promise<void> {
+        let final = buildMessage(showFinished);
         if (final) {
             await exitProcess(0, final);
         }

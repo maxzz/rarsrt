@@ -152,8 +152,6 @@ function handleFolder(targetFolder: string) {
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
     final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
 
-    // notes.addProcessed(`     ${`(${final.length})`.padStart(7, ' ')}: ${lastFolder}`);
-    // notes.addProcessed(`     ${'skipped'}: ${lastFolder}`);
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
 
@@ -227,7 +225,7 @@ async function main() {
         //TODO: else [...targets.files, ...targets.dirs] 
     }
 
-    notes.show();
+    notes.show(false);
 }
 
 main().catch(async (error) => {
