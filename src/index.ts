@@ -75,7 +75,10 @@ namespace appUtils {
             execSync(cmd);
             //console.log('cmd', cmd);
         } catch (error) {
-            throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nError:\n${error.message}\n`);
+            //console.log(`stdout`, error.stdout.toString());
+            // TODO: run it again to get nice error message
+            //TODO: mp0 trick seams not working
+            throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nCommand:\n${cmd}\n\nError:\n${error.message}\n`);
         }
     }
 
