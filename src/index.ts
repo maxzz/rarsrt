@@ -194,16 +194,20 @@ async function main() {
         let target = targets.dirs[0];
 
         let root: osStuff.folderItem = osStuff.collectDirItems(target);
+        /*
         if (root.files.length) {
             // This is not an error, just a regular case.
             //notes.add(`--- INFO: Skipped mixed content (folder(s) and file(s) in:)\n    b:${root.name}`);
         } else {
+        */
             targets.dirs = root.subs.map((_: osStuff.folderItem) => _.name);
-        }
+        /*}*/
     }
 
     // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
     // await exitProcess(0, '');
+
+    // TODO: handle 'rarsrt .'
 
     if (targets.files.length) {
         throw newErrorArgs('Separate handling of filenames has not yet been implemented');
