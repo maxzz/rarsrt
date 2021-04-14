@@ -15,7 +15,11 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "args": ["tests"],
+            "args": [
+                "C:/Users/maxzz/Desktop/111/D3.js - Complete Developer Data Visualization Guide - 2021/01 Introduction",
+                "C:/Users/maxzz/Desktop/111/D3.js - Complete Developer Data Visualization Guide - 2021/02 Installing Development Tools",
+            ],
+            // "args": ["tests"],
             "console": "externalTerminal"
         }
     ]

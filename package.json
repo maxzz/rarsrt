@@ -1,5 +1,5 @@
 {
-    "name": "merge-subtitles",
+    "name": "rarsrt",
     "version": "1.0.5",
     "author": "Max Zakharzhevskiy",
     "description": "Utility to combine .SRT subtitles with .MP4 files inside specified folders.",
@@ -14,16 +14,19 @@
     },
     "keywords": [
         "utility",
-        "winrar",
+        "video",
+        "subtitles",
+        "mp4",
+        "srt",
         "javascript",
         "typescript"
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/maxzz/merge-subtitles.git"
+        "url": "git+https://github.com/maxzz/rarsrt.git"
     },
     "bugs": {
-        "url": "https://github.com/maxzz/merge-subtitles/issues"
+        "url": "https://github.com/maxzz/rarsrt/issues"
     },
     "scripts": {
         "dev": "tsc",

@@ -35,15 +35,15 @@ export function newErrorArgs(msg: string): ErrorArgs {
 
 export function help() {
     let help = `
-${chalk.cyan('mergesubs')} utility will combine .SRT subtitles with .MP4 files inside specified folders..
+${chalk.cyan('rarsrt')} utility will combine .SRT subtitles with .MP4 files inside specified folders..
 Version ${cfg.version}
-Usage: mergesubs <file(s).mp4> | <folder(s)>`;
+Usage: rarsrt <file(s).mp4> | <folder(s)>`;
     console.log(help);
 }
 
 export namespace notes {
     let messages: string[] = []; // messages will be shown if any warnings happen.
-    let processed: string[] = []; // processed will be shown if mergesubs processed more then one folder.
+    let processed: string[] = []; // processed will be shown if rarsrt processed more then one folder.
 
     export function add(note: string): void {
         messages.push(note);
@@ -57,7 +57,7 @@ export namespace notes {
         let p = processed.length > 1 ? chalk.blueBright(`Processed:\n${processed.join('\n')}\n`) : '';
         let s = messages.length ? chalk.yellow(`\nNotes:\n${messages.join('\n')}\n`) : '';
         let f = `${p}${s}`;
-        return f ? showFinished ? `mergesubs finished\n\n${f}` : f : '';
+        return f ? showFinished ? `rarsrt finished\n\n${f}` : f : '';
     }
 
     export function willShow(): boolean {
