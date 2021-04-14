@@ -13,13 +13,13 @@ namespace osStuff {
         btime: Date;        // file created (birthtime) timestamp
         mtime?: Date;       // file data modified timestamp; present if different from btime
         size: number;       // file size
-    }
+    };
 
     export type folderItem = {
         name: string;       // Folder full name
         files: fileItem[];  // Short filenames i.e. wo/ path.
         subs: folderItem[]; // Sub-folders.
-    }
+    };
 
     function collectFiles(dir: string, rv: folderItem, recursive: boolean): void {
         rv.files.push(...fs.readdirSync(dir).map((_) => {
@@ -41,7 +41,7 @@ namespace osStuff {
                 let newFile: fileItem = {
                     short: _,
                     btime: st.birthtime,
-                    ...(st.birthtime !== st.mtime && {mtime: st.mtime}),
+                    ...(st.birthtime !== st.mtime && { mtime: st.mtime }),
                     size: st.size,
                 };
                 return newFile;
@@ -64,13 +64,13 @@ namespace osStuff {
 namespace appUtils {
 
     let FFMPEG: string;
-    
+
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
 
-        let cmd = `"${FFMPEG}" -y -loglevel quiet -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`
+        let cmd = `"${FFMPEG}" -y -loglevel quiet -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
             execSync(cmd);
             //console.log('cmd', cmd);
@@ -91,20 +91,20 @@ namespace appUtils {
 
 function handleFiles(filesToRar: string[]): void {
     // 0. Simulate rardir behaviour. Files should be in the same folder.
-/*
-    let root = path.dirname(filesToRar[0]);
-    let files = filesToRar.map(_ => path.basename(_));
-    let fnameRar = path.join(root, 'tm.rar');
-
-    if (exist(fnameRar)) { // If tm.rar exist then use shift+drag to move into rar.
-        notes.add(`--- INFO: tm.rar already exist here:\n    b:${root}`);
-        return;
-    }
-
-    // Create dirs.txt and add to tm.rar.
-
-    appUtils.createFileMp4WithSrt(fnameRar, root, files);
-*/    
+    /*
+        let root = path.dirname(filesToRar[0]);
+        let files = filesToRar.map(_ => path.basename(_));
+        let fnameRar = path.join(root, 'tm.rar');
+    
+        if (exist(fnameRar)) { // If tm.rar exist then use shift+drag to move into rar.
+            notes.add(`--- INFO: tm.rar already exist here:\n    b:${root}`);
+            return;
+        }
+    
+        // Create dirs.txt and add to tm.rar.
+    
+        appUtils.createFileMp4WithSrt(fnameRar, root, files);
+    */
 }
 
 function handleFolder(targetFolder: string) {
@@ -114,17 +114,17 @@ function handleFolder(targetFolder: string) {
     let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
 
     // 2. Get what we have inside this folder.
-    type FItem = osStuff.fileItem & { ext: fnames.extType };
+    type FItem = osStuff.fileItem & { ext: fnames.extType; };
 
     let fItems: FItem[] = filesAndFolders.files.map((_: osStuff.fileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
 
     type MSPair = { // mp4 and srt pair
         mp4?: string;
         srt?: string;
-    }
+    };
 
     type MSPairs = Record<string, MSPair>;
-    
+
     let msPairs: MSPairs = {};
 
     fItems.forEach((item: FItem) => {
@@ -137,12 +137,11 @@ function handleFolder(targetFolder: string) {
         }
     });
 
-    // Now make only names: ["01 - Introduction", ...]
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
-    final.forEach((names) => {
-        let mp4 = path.join(targetFolder, `${names[1].mp4}`);
-        let srt = path.join(targetFolder, `${names[1].srt}`);
-        let out = path.join(targetFolder, `${names[0]},,,tm,,,.mp4`); // TODO: check filename length < 255
+    final.forEach(([name, pair]) => {
+        let mp4 = path.join(targetFolder, `${pair.mp4}`);
+        let srt = path.join(targetFolder, `${pair.srt}`);
+        let out = path.join(targetFolder, `${name},,,tm,,,.mp4`); // TODO: check filename length < 255
         appUtils.createFileMp4WithSrt(mp4, srt, out);
 
         // Remove .srt, .mp4 files and rename the new file wo/ ',,,tm,,,' suffix.
@@ -156,8 +155,8 @@ function handleFolder(targetFolder: string) {
     //console.log(`final ${JSON.stringify(final, null, 4)}`);
 }
 
-function checkArg(argTargets: string[]): { files: string[]; dirs: string[] } {
-    let rv =  {
+function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
+    let rv = {
         files: [],
         dirs: [],
     };
@@ -184,7 +183,7 @@ async function main() {
 
     let args = require('minimist')(process.argv.slice(2), {
     });
-    
+
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
 
