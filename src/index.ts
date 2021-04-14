@@ -141,12 +141,17 @@ function handleFolder(targetFolder: string) {
     const oneFileAction = (targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) => {
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `${shortOut},,,tm,,,.mp4`); // TODO: check filename length < 255
+        let out = path.join(targetFolder, `${shortOut}.mp0`); // TODO: check filename length < 255
+
+        if (srt.length > 248) {
+            throw Error(`The filename is too long (${srt.length}):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 255} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
+        }
+
         appUtils.createFileMp4WithSrt(mp4, srt, out);
 
         rimraf.sync(srt);
         rimraf.sync(mp4);
-        fs.renameSync(out, mp4); // Remove .srt, .mp4 files and rename the new file wo/ ',,,tm,,,' suffix.
+        fs.renameSync(out, mp4);
     };
 
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
