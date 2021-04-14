@@ -140,7 +140,7 @@ function handleFolder(targetFolder: string) {
 
     function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
         
-        console.log(`The file names in the folder are too long.\nFolder:\n\n${targetFolder}\n\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long.\nThe lengths of the filenames in the folder:\n`);
+        console.log(`The file names in the folder are too long.\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long.\nFolder:\n\n${targetFolder}\n\nThe lengths of the filenames in the folder:\n`);
         final.forEach(([name, pair]) => {
             let s = path.join(targetFolder, `${pair.srt}`);
             console.log(`    ${`${s.length}`.padStart(7, ' ')}: ${pair.srt}`);
