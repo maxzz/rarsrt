@@ -98,14 +98,14 @@ function handleFiles(filesToRar: string[]): void {
         let root = path.dirname(filesToRar[0]);
         let files = filesToRar.map(_ => path.basename(_));
         let fnameRar = path.join(root, 'tm.rar');
-    
+
         if (exist(fnameRar)) { // If tm.rar exist then use shift+drag to move into rar.
             notes.add(`--- INFO: tm.rar already exist here:\n    b:${root}`);
             return;
         }
-    
+
         // Create dirs.txt and add to tm.rar.
-    
+
         appUtils.createFileMp4WithSrt(fnameRar, root, files);
     */
 }
@@ -142,11 +142,12 @@ function handleFolder(targetFolder: string) {
     });
 
     function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
-        
-        console.log(`${chalk.yellow(`The file names in the folder are too long.`)}\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long.\n\n${chalk.yellow('Folder:')}\n${targetFolder}\n\n${chalk.yellow('The lengths of the filenames in the folder:')}`);
+        console.log(`${chalk.yellow(`The file names in the folder are too long.`)}\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long, so ${248-targetFolder.length} characters remain for the longest name in that folder.\n\n${chalk.yellow('Folder:')}\n${targetFolder}\n\n${chalk.yellow('The lengths of the filenames in the folder:')}\n    length | name \n    -------|------------------`);
         final.forEach(([name, pair]) => {
             let s = path.join(targetFolder, `${pair.srt}`);
-            console.log(`${chalk[s.length > 248 ? 'red' : 'white'](`${s.length}`.padStart(7, ' '))}: ${pair.srt}`);
+            let isLong = s.length > 248;
+            let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
+            console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srt}`);
         });
     }
 
@@ -157,7 +158,7 @@ function handleFolder(targetFolder: string) {
 
         if (srt.length > 248) {
             printFilenameLength(targetFolder, final);
-            throw Error(`The filename is too long (${srt.length}):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 255} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
+            throw Error(`The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
         }
 
         appUtils.createFileMp4WithSrt(mp4, srt, out);
@@ -233,7 +234,7 @@ async function main() {
             let rootDir = path.dirname(targets.dirs[0]);
             console.log(chalk.blueBright(`Processing root:\n${rootDir}\n`));
         }
-        //TODO: else [...targets.files, ...targets.dirs] 
+        //TODO: else [...targets.files, ...targets.dirs]
     }
 
     notes.show(false);
