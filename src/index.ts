@@ -153,7 +153,7 @@ function handleFolder(targetFolder: string) {
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `${shortOut}.mp0`);
+        let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
         if (srt.length > 248) {
             printFilenameLength(targetFolder, final);
