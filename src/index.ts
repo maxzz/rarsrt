@@ -206,8 +206,8 @@ async function main() {
     // await exitProcess(0, '');
 
     if (targets.files.length) {
-        notes.add('Separate handling of filenames has not yet been implemented.');
-        
+        throw newErrorArgs('Separate handling of filenames has not yet been implemented');
+
         handleFiles([...targets.files, ...targets.dirs]); // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
     } else if (targets.dirs.length) {
         for (let dir of targets.dirs) {
