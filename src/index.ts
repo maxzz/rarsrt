@@ -243,15 +243,21 @@ async function main() {
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
 
-    // let animIndex = 0;
-    // let animations = [':', '/', '-', '\\', ':', '/', '-', '\\'];
+    let animIndex = 0;
+    //let animations = [':', '/', '-', '\\'];
+    //let animations = ['▁', '▂', '▃', '▄']; //▁ ▂ ▃ ▄ ▅ ▆ ▇ █ ▇ ▆ ▅ ▄ ▃ ▁
+    //let animations = ['▖', '▘', '▝', '▗']; //▖ ▘ ▝ ▗
+    //let animations = ['⡀', '⡁', '⡂', '⡃']; //⡀⡁⡂⡃
+    let animations = ['    ', ' .  ', '  . ', '   .', '  . ', '   .' ];
+    //let animations = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    //let animations = ['◰', '◳', '◲', '◱'];
 
-    // for (var i = 0; i < 1000000; i++) {
-    //     let charIdx = i % animations.length;
-    //     process.stdout.write(`${animations[charIdx]}\r`);
-    // }
+    for (var i = 0; i < 100000; i++) {
+        let charIdx = i % animations.length;
+        process.stdout.write(`${animations[charIdx]}\r`);
+    }
 
-    // return;
+    return;
 
 
     let targets = checkArg(args._ || []);
