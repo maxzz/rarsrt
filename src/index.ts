@@ -77,8 +77,27 @@ namespace appUtils {
         } catch (error) {
             //console.log(`stdout`, error.stdout.toString());
             // TODO: run it again to get nice error message
-            //TODO: mp0 trick seams not working
-            throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nCommand:\n${cmd}\n\nError:\n${error.message}\n`);
+            let s = removeIndent(
+                `
+                Failed to create
+                    ${fullNameMp4}
+                    ${fullNameSrt}
+                    ${fullNameOut}
+                
+                Command:
+                    ${cmd}
+                
+                Error:
+                `) + error.message;
+                console.log('eee', error.stderr.toString());
+                /*
+                    [NULL @ 000001b9f043ac40] Unable to find a suitable output format for 'C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0'
+                    C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0: Invalid argument
+                    eee [NULL @ 000001b9f043ac40] Unable to find a suitable output format for 'C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0'
+                    C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0: Invalid argument                
+                */
+            throw new Error(s);
+            // throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nCommand:\n${cmd}\n\nError:\n${error.message}\n`);
         }
     }
 
