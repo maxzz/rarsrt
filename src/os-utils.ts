@@ -81,7 +81,8 @@ export function removeIndent(src: string, all?: boolean): string {
     }
     // 2. remove the shortest leading indentation from each line
     const match = src.match(/^[^\S\n]*(?=\S)/gm);
-    const indent = match && Math.min(...match.map(el => el.length));
+    match && !match[0] && match.shift(); // remove the first line if empty
+    const indent = match && Math.min(...match.map(line => line.length));
     if (indent) {
         const regexp = new RegExp(`^.{${indent}}`, 'gm');
         return src.replace(regexp, '');

@@ -72,30 +72,22 @@ namespace appUtils {
 
         let cmd = `"${FFMPEG}" -y -loglevel error -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            execSync(cmd);
-            //console.log('cmd', cmd);
+            let stderr = execSync(cmd, {stdio: 'ignore'});
+            //console.log(`stdeee`, stderr.toString());
         } catch (error) {
-            //console.log(`stdout`, error.stdout.toString());
+            //console.log(`stdout`, error.stderr.toString());
             // TODO: run it again to get nice error message
-            let s = removeIndent(
-                `
-                Failed to create
+            let s = chalk.gray(removeIndent(`
+                ${chalk.red('Failed to create')}
                     ${fullNameMp4}
                     ${fullNameSrt}
                     ${fullNameOut}
                 
-                Command:
-                    ${cmd}
+                ${chalk.red('Command:')}
+                ${cmd}
                 
-                Error:
-                `) + error.message;
-                console.log('eee', error.stderr.toString());
-                /*
-                    [NULL @ 000001b9f043ac40] Unable to find a suitable output format for 'C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0'
-                    C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0: Invalid argument
-                    eee [NULL @ 000001b9f043ac40] Unable to find a suitable output format for 'C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0'
-                    C:\Users\maxzz\Desktop\111\Docker for Developers, Dockerize React, Node, Mongo and more - 2021\18 Final Project - Developing our Node app directly inside a container\temp-tm-temp.mp0: Invalid argument                
-                */
+                ${chalk.red('Error:')}
+                `)) + chalk.gray(error.message);
             throw new Error(s);
             // throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nCommand:\n${cmd}\n\nError:\n${error.message}\n`);
         }
