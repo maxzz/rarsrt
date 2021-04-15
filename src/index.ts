@@ -172,9 +172,6 @@ function handleFolder(targetFolder: string) {
     }
 
     let animIndex = 0;
-    // let animations = ['    ', ' .  ', '  . ', '   .', '  . ', '   .'];
-    // let animations = ['|', '/', '-', '\\'];
-    // let animations = ['.', 'o', 'O', '@', '*'];
     let animations = [".", "o", "O", "o"];
      
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
@@ -244,19 +241,6 @@ async function main() {
 
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
-
-    // let animations = ['    ', ' .  ', '  . ', '   .', '  . ', '   .'];
-    // let animations = [' :', ' /', ' -', ' \\'];
-    // let animations = [' -', ' +'];
-    // let animations = [".  ",    ".. ",    "...",    " ..",    "  .",    "   "];
-    // let animations = ["+", "x", "*"];
-    // let animations = ["_", "_", "_", "-", "`", "`", "'", "´", "-", "_", "_", "_"];
-    // let animations = [".", "o", "O", "o", ".", ".", ".", "."];
-    // for (var i = 0; i < 100000; i++) {
-    //     let charIdx = i % animations.length;
-    //     process.stdout.write(` ${animations[charIdx]}\r`);
-    // }
-    // return;
 
     let targets = checkArg(args._ || []);
 
