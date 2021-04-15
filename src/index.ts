@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
-import { exist, fnames, reduceIndentByLast, removeIndent } from './os-utils';
+import { exist, fnames, removeIndent } from './os-utils';
 import { exitProcess, help, newErrorArgs, notes } from './process-utils';
 import rimraf from 'rimraf';
 
@@ -204,30 +204,6 @@ async function main() {
 
     let args = require('minimist')(process.argv.slice(2), {
     });
-
-    let sss = removeIndent(`
-            aa
-            bb
-        }`);
-    console.log('sss', sss);
-
-    let ttt = reduceIndentByLast(`
-            aa
-            bb
-        }`);
-    console.log('ttt', ttt);
-/*
-sss
-    aa
-    bb
-}
-
-ttt
-        aa
-        bb
-    }
-*/
-    return;
 
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
