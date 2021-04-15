@@ -83,7 +83,7 @@ namespace appUtils {
                 ${chalk.yellow('Folder:')}
                 ${path.dirname(fullNameSrt)}
                 ${chalk.yellow('Command:')}
-                ${cmd}`));
+                ${cmd}`).replace(/^\r?\n/, ''));
             throw new Error(s);
         }
     }
@@ -160,11 +160,8 @@ function handleFolder(targetFolder: string) {
             
             ${chalk.yellow('The lengths of the filenames in the folder:')}
                 length | name
-                -------|------------------
-            `);
+                -------|------------------`);
         console.log(ss);
-
-        //console.log(`${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is': 'are'} too long.`)}\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long, so ${248-targetFolder.length} characters remain for the longest name in that folder.\n\n${chalk.yellow('Folder:')}\n${targetFolder}\n\n${chalk.yellow('The lengths of the filenames in the folder:')}\n    length | name \n    -------|------------------`);
         
         final.forEach(([name, pair]) => {
             let s = path.join(targetFolder, `${pair.srt}`);
@@ -177,12 +174,19 @@ function handleFolder(targetFolder: string) {
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `temp-tm-temp.mp0`);
+        let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
         if (srt.length > 248) {
             notes.flushProcessed();
             printFilenameLength(targetFolder, final);
-            throw Error(`The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`);
+            let ss = removeIndent(`
+                The filename is too long (${srt.length} characters):
+                ${chalk.gray(srt)}
+                
+                ${chalk.yellow(`Rename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`)}`
+            ).replace(/^\r?\n/, '');
+            //let ss = `The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`;
+            throw Error(ss);
         }
 
         appUtils.createFileMp4WithSrt(mp4, srt, out);
