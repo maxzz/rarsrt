@@ -70,7 +70,7 @@ namespace appUtils {
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
 
-        let cmd = `"${FFMPEG}" -y -loglevel quiet -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
+        let cmd = `"${FFMPEG}" -y -loglevel error -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
             execSync(cmd);
             //console.log('cmd', cmd);
@@ -155,7 +155,7 @@ function handleFolder(targetFolder: string) {
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `temp-tm-temp.mp4`);
+        let out = path.join(targetFolder, `temp-tm-temp.mp0`);
 
         if (srt.length > 248) {
             notes.flushProcessed();
