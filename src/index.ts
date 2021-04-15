@@ -72,14 +72,14 @@ namespace appUtils {
 
         let cmd = `"${FFMPEG}" -y -loglevel error -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            let stderr = execSync(cmd, {stdio: 'ignore'});
-            //console.log(`stdeee`, stderr.toString());
+            let stderr = execSync(cmd, {stdio: 'inherit'});
+            console.log(`stdeee`, stderr.toString());
         } catch (error) {
             //console.log(`stdout`, error.stderr.toString());
             // TODO: run it again to get nice error message
             let s = chalk.gray(removeIndent(`
                 ${chalk.red('Failed to create')}
-                    ${fullNameMp4}
+                    ${path.basename(fullNameMp4)}
                     ${fullNameSrt}
                     ${fullNameOut}
                 
