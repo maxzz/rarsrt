@@ -69,27 +69,22 @@ namespace appUtils {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
+        // TODO: we may run it again to get nice error message
 
         let cmd = `"${FFMPEG}" -y -loglevel error -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            let stderr = execSync(cmd, {stdio: 'inherit'});
-            console.log(`stdeee`, stderr.toString());
+            execSync(cmd, {stdio: 'inherit'});
         } catch (error) {
-            //console.log(`stdout`, error.stderr.toString());
-            // TODO: run it again to get nice error message
             let s = chalk.gray(removeIndent(`
-                ${chalk.red('Failed to create')}
+                ${chalk.yellow('Failed to proceed:')}
                     ${path.basename(fullNameMp4)}
-                    ${fullNameSrt}
-                    ${fullNameOut}
-                
-                ${chalk.red('Command:')}
-                ${cmd}
-                
-                ${chalk.red('Error:')}
-                `)) + chalk.gray(error.message);
+                    ${path.basename(fullNameSrt)}
+                    
+                ${chalk.yellow('Folder:')}
+                ${path.dirname(fullNameSrt)}
+                ${chalk.yellow('Command:')}
+                ${cmd}`));
             throw new Error(s);
-            // throw new Error(`Failed to create \n    ${fullNameMp4}\n    ${fullNameSrt}\n    ${fullNameOut}\n\nCommand:\n${cmd}\n\nError:\n${error.message}\n`);
         }
     }
 
