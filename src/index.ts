@@ -171,12 +171,20 @@ function handleFolder(targetFolder: string) {
         });
     }
 
+    let animIndex = 0;
+    // let animations = ['|', '/', '-', '\\'];
+    let animations = ['.', 'o', 'O', '@', '*'];
+     
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
+        process.stdout.write(`${animations[animIndex++ % animations.length]}\r`);
+
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
         let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
         if (srt.length > 248) {
+            process.stdout.write(` \r`);
+
             notes.flushProcessed();
             printFilenameLength(targetFolder, final);
             let ss = removeIndent(`
@@ -190,6 +198,7 @@ function handleFolder(targetFolder: string) {
         }
 
         appUtils.createFileMp4WithSrt(mp4, srt, out);
+        process.stdout.write(` \r`);
 
         rimraf.sync(srt);
         rimraf.sync(mp4);
@@ -233,6 +242,17 @@ async function main() {
 
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
+
+    // let animIndex = 0;
+    // let animations = [':', '/', '-', '\\', ':', '/', '-', '\\'];
+
+    // for (var i = 0; i < 1000000; i++) {
+    //     let charIdx = i % animations.length;
+    //     process.stdout.write(`${animations[charIdx]}\r`);
+    // }
+
+    // return;
+
 
     let targets = checkArg(args._ || []);
 
