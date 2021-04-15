@@ -61,7 +61,7 @@ export namespace notes {
     }
 
     export function flushProcessed(): void {
-        let p = processed.length > 1 ? chalk.blueBright(`Processed:\n${processed.join('\n')}\n`) : '';
+        let p = processed.length > 1 ? chalk.blueBright(`Processed:\n${processed.join('\n')}`) : '';
         p && console.log(p);
         processed = [];
     }

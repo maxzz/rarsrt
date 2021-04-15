@@ -79,7 +79,7 @@ namespace appUtils {
                 ${chalk.yellow('Failed to proceed:')}
                     ${path.basename(fullNameMp4)}
                     ${path.basename(fullNameSrt)}
-                    
+
                 ${chalk.yellow('Folder:')}
                 ${path.dirname(fullNameSrt)}
                 ${chalk.yellow('Command:')}
@@ -149,7 +149,23 @@ function handleFolder(targetFolder: string) {
 
     function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
         let oneLong = final.filter(([name, pair]) => targetFolder.length + pair.srt.length > 248).length === 1;
-        console.log(`${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is': 'are'} too long.`)}\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long, so ${248-targetFolder.length} characters remain for the longest name in that folder.\n\n${chalk.yellow('Folder:')}\n${targetFolder}\n\n${chalk.yellow('The lengths of the filenames in the folder:')}\n    length | name \n    -------|------------------`);
+        
+        let ss = removeIndent(`
+            ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is': 'are'} too long.`)}
+            The maximum file name length must not exceed 248 characters.
+            The folder name is ${chalk.gray(`${targetFolder.length}`)} characters long, so ${chalk.gray(`${248-targetFolder.length}`)} characters remain for the longest name in that folder.
+            
+            ${chalk.yellow('Folder:')}
+            ${targetFolder}
+            
+            ${chalk.yellow('The lengths of the filenames in the folder:')}
+                length | name
+                -------|------------------
+            `);
+        console.log(ss);
+
+        //console.log(`${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is': 'are'} too long.`)}\nThe maximum file name length must not exceed 248 characters.\nThe folder name is ${targetFolder.length} characters long, so ${248-targetFolder.length} characters remain for the longest name in that folder.\n\n${chalk.yellow('Folder:')}\n${targetFolder}\n\n${chalk.yellow('The lengths of the filenames in the folder:')}\n    length | name \n    -------|------------------`);
+        
         final.forEach(([name, pair]) => {
             let s = path.join(targetFolder, `${pair.srt}`);
             let isLong = s.length > 248;
