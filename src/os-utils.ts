@@ -59,7 +59,6 @@ export namespace fnames {
         ['.unitypackage', extType.unity],
         ['.txt',          extType.txt],
         ['.srt',          extType.srt],
-        ['.vtt',          extType.srt],
         ['.avi',          extType.avi],
         ['.mp4',          extType.mp4],
         ['.mkv',          extType.mkv],
