@@ -236,6 +236,9 @@ function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
 async function main() {
     appUtils.findFFMpeg();
 
+    // console.log('args', JSON.stringify(process.argv.slice(2), null, 4));
+    // await exitProcess(0, '');
+
     let args = require('minimist')(process.argv.slice(2), {
     });
 
