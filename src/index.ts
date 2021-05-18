@@ -65,13 +65,13 @@ namespace appUtils {
 
     let FFMPEG: string;
 
-    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
+    function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error'): string | undefined {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
         // TODO: we may run it again to get nice error message
 
-        let cmd = `"${FFMPEG}" -y -loglevel error -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
+        let cmd = `"${FFMPEG}" -y -loglevel ${loglevel} -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
             execSync(cmd, {stdio: 'inherit'});
         } catch (error) {
@@ -84,7 +84,17 @@ namespace appUtils {
                 ${path.dirname(fullNameSrt)}
                 ${chalk.yellow('Command:')}
                 ${cmd}`).replace(/^\r?\n/, ''));
-            throw new Error(s);
+            //throw new Error(s);
+            return s;
+        }
+    }
+
+    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
+
+        let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
+        if (error) {
+            error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
+            throw new Error(error);
         }
     }
 
