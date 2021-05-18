@@ -90,10 +90,11 @@ namespace appUtils {
     }
 
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
-
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
+            console.log(chalk.blue('\nError verbose information:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
+            console.log(chalk.blue('----------------------'));
             throw new Error(error);
         }
     }
