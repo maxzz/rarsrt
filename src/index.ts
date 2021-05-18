@@ -69,7 +69,10 @@ namespace appUtils {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
-        // TODO: we may run it again to get nice error message
+        // TODO: We may run it again to get nice error message <- done
+
+        // If error is: "<filename>.srt: Invalid data found when processing input"
+        // Then very likely srt file has extra empty lines, so we can remove all empty lines.
 
         let cmd = `"${FFMPEG}" -y -loglevel ${loglevel} -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
@@ -92,7 +95,7 @@ namespace appUtils {
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
-            console.log(chalk.blue('\nError verbose information:'));
+            console.log(chalk.blue('\nDetails of the error:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
             console.log(chalk.blue('----------------------'));
             throw new Error(error);
