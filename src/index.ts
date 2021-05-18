@@ -172,7 +172,7 @@ function handleFolder(targetFolder: string) {
     }
 
     let animIndex = 0;
-    let animations = [".", "o", "O", "o"];
+    let animations = [".", "o", "O", "o"]; // TODO: write item of # items and current item name
      
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
         process.stdout.write(` ${animations[animIndex++ % animations.length]}\r`);
