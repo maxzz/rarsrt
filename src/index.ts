@@ -110,9 +110,9 @@ namespace appUtils {
         if (error) {
             process.stdout.write(chalk.blue(`         \r${chalk.red(error.stderr)}`));
 
-            process.stdout.write(chalk.blue('         \rDetails of the error:'));
+            process.stdout.write(chalk.blue('         \r\nDetails of the error:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
-            process.stdout.write(chalk.blue(`${chalk.gray(error.stderr)}`));
+            process.stdout.write(chalk.blue(`\n${chalk.gray(error.stderr)}`));
             console.log(chalk.blue('----------------------'));
             throw new Error(error.cmderr);
         }
