@@ -77,12 +77,13 @@ namespace appUtils {
 
         let cmd = `"${FFMPEG}" -y -loglevel ${loglevel} -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            // execSync(cmd);
-            // execSync(cmd, {stdio: 'inherit'});
-            // execSync(cmd, {stdio: ['inherit', process.stdout, 'inherit']});
             execSync(cmd, {stdio: ['inherit', 'inherit', 'pipe']});
         } catch (error) {
-            //.srt: Invalid data found when processing input
+            let childError: string = error.stderr.toString();
+            if (childError.match(/\.srt: Invalid data found when processing input/)) {
+                console.log('lf-nl');
+            }
+
             //process.stdout.write(` \r`);
             let s = chalk.gray(removeIndent(`
                 ${chalk.yellow('Failed to proceed:')}
