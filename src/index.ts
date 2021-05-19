@@ -217,14 +217,14 @@ function handleFolder(targetFolder: string) {
     let animations = [".", "o", "O", "o"]; // TODO: write item of # items and current item name
      
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
-        process.stdout.write(` ${animations[animIndex++ % animations.length]}\r`);
+        process.stdout.write(` ${animations[animIndex++ % animations.length]}${animations[animIndex % animations.length]}${animations[(animIndex+1) % animations.length]}\r`);
 
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
         let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
         if (srt.length > 248) {
-            process.stdout.write(` \r`);
+            process.stdout.write(`   \r`);
 
             notes.flushProcessed();
             printFilenameLength(targetFolder, final);
@@ -239,7 +239,7 @@ function handleFolder(targetFolder: string) {
         }
 
         let result = appUtils.createFileMp4WithSrt(mp4, srt, out);
-        process.stdout.write(` \r`);
+        process.stdout.write(`   \r`);
 
         if (!result?.skipped) {
             rimraf.sync(srt);
@@ -315,7 +315,7 @@ async function main() {
     if (notes.willShow()) {
         if (targets.dirs.length) {
             let rootDir = path.dirname(targets.dirs[0]);
-            console.log(chalk.blueBright(`Processed root:\n${rootDir}\n`));
+            console.log(chalk.blueBright(`Processed root:\n${rootDir}`));
         }
         //TODO: else [...targets.files, ...targets.dirs]
     }
