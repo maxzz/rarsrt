@@ -29,7 +29,7 @@
         "url": "https://github.com/maxzz/rarsrt/issues"
     },
     "scripts": {
-        "dev": "tsc",
+        "dev": "tsc -w",
         "build": "rm -rf dist && tsc",
         "prepublish": "yarn build",
         "makebin": "yarn build && pkg -t host -o mergesubs dist/index.js"

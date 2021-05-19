@@ -5,7 +5,6 @@ import chalk from 'chalk';
 import { exist, fnames, removeIndent } from './os-utils';
 import { exitProcess, help, newErrorArgs, notes } from './process-utils';
 import rimraf from 'rimraf';
-import { stderr } from 'node:process';
 
 namespace osStuff {
 
@@ -86,7 +85,6 @@ namespace appUtils {
                 isMultilineSrt = true;
             }
 
-            //process.stdout.write(` \r`);
             let s = chalk.gray(removeIndent(`
                 ${chalk.yellow('Failed to proceed:')}
                     ${path.basename(fullNameMp4)}
@@ -105,9 +103,10 @@ namespace appUtils {
         }
     }
 
-    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
+    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean } | undefined {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
+            // Try to recover the bad srt file formatting.
             if (error.isMultilineSrt) {
                 let srtCnt = fs.readFileSync(fullNameSrt, 'utf8');
                 let lines = srtCnt.split(/\r?\n/).filter(Boolean);
@@ -115,12 +114,18 @@ namespace appUtils {
                 error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
             }
             if (error) {
-                process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
-                error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
-                process.stdout.write(chalk.white('Error details:\n'));
-                process.stdout.write(chalk.gray(error.stderr));
-                console.log(chalk.white('------------------'));
-                throw new Error(error.cmderr);
+                // If did not recovered the bad srt file formatting then report but continue with other files.
+                if (error.isMultilineSrt) {
+                    notes.add(chalk.red(`* Skipped file merge (bad .srt format):\n  Folder: ${path.dirname(fullNameSrt)}\n    File: ${path.basename(fullNameSrt)}`));
+                    return { skipped: true };
+                } else {
+                    process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
+                    error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
+                    process.stdout.write(chalk.white('Error details:\n'));
+                    process.stdout.write(chalk.gray(error.stderr));
+                    console.log(chalk.white('------------------'));
+                    throw new Error(error.cmderr);
+                }
             }
         }
     }
@@ -233,12 +238,14 @@ function handleFolder(targetFolder: string) {
             throw Error(ss);
         }
 
-        appUtils.createFileMp4WithSrt(mp4, srt, out);
+        let result = appUtils.createFileMp4WithSrt(mp4, srt, out);
         process.stdout.write(` \r`);
 
-        rimraf.sync(srt);
-        rimraf.sync(mp4);
-        fs.renameSync(out, mp4);
+        if (!result?.skipped) {
+            rimraf.sync(srt);
+            rimraf.sync(mp4);
+            fs.renameSync(out, mp4);
+        }
     }
 
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
@@ -308,12 +315,12 @@ async function main() {
     if (notes.willShow()) {
         if (targets.dirs.length) {
             let rootDir = path.dirname(targets.dirs[0]);
-            console.log(chalk.blueBright(`Processing root:\n${rootDir}\n`));
+            console.log(chalk.blueBright(`Processed root:\n${rootDir}\n`));
         }
         //TODO: else [...targets.files, ...targets.dirs]
     }
 
-    notes.show(false);
+    await notes.show(false);
 }
 
 main().catch(async (error) => {
