@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import { exist, fnames, removeIndent } from './os-utils';
 import { exitProcess, help, newErrorArgs, notes } from './process-utils';
 import rimraf from 'rimraf';
+import { stderr } from 'node:process';
 
 namespace osStuff {
 
@@ -76,8 +77,13 @@ namespace appUtils {
 
         let cmd = `"${FFMPEG}" -y -loglevel ${loglevel} -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            execSync(cmd, {stdio: 'inherit'});
+            // execSync(cmd);
+            // execSync(cmd, {stdio: 'inherit'});
+            // execSync(cmd, {stdio: ['inherit', process.stdout, 'inherit']});
+            execSync(cmd, {stdio: ['inherit', 'inherit', 'pipe']});
         } catch (error) {
+            //.srt: Invalid data found when processing input
+            //process.stdout.write(` \r`);
             let s = chalk.gray(removeIndent(`
                 ${chalk.yellow('Failed to proceed:')}
                     ${path.basename(fullNameMp4)}
@@ -95,7 +101,7 @@ namespace appUtils {
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
-            console.log(chalk.blue('\nDetails of the error:'));
+            process.stdout.write(chalk.blue('\r         \nDetails of the error:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
             console.log(chalk.blue('----------------------'));
             throw new Error(error);
