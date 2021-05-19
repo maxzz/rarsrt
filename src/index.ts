@@ -108,7 +108,9 @@ namespace appUtils {
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
-            process.stdout.write(chalk.blue('\r         \nDetails of the error:'));
+            process.stdout.write(chalk.blue(`         \r${chalk.red(error.stderr)}`));
+
+            process.stdout.write(chalk.blue('         \rDetails of the error:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
             console.log(chalk.blue('----------------------'));
             throw new Error(error.cmderr);
