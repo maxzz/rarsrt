@@ -66,7 +66,7 @@ namespace appUtils {
 
     let FFMPEG: string;
 
-    function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error'): string | undefined {
+    function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error') : { stderr: string, cmderr: string, isMultilineSrt: boolean } | undefined {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
@@ -79,9 +79,11 @@ namespace appUtils {
         try {
             execSync(cmd, {stdio: ['inherit', 'inherit', 'pipe']});
         } catch (error) {
+            let isMultilineSrt = false;
+
             let childError: string = error.stderr.toString();
             if (childError.match(/\.srt: Invalid data found when processing input/)) {
-                console.log('lf-nl');
+                isMultilineSrt = true;
             }
 
             //process.stdout.write(` \r`);
@@ -94,8 +96,12 @@ namespace appUtils {
                 ${path.dirname(fullNameSrt)}
                 ${chalk.yellow('Command:')}
                 ${cmd}`).replace(/^\r?\n/, ''));
-            //throw new Error(s);
-            return s;
+            
+            return {
+                stderr: childError,
+                cmderr: s,
+                isMultilineSrt,
+            };
         }
     }
 
@@ -105,7 +111,7 @@ namespace appUtils {
             process.stdout.write(chalk.blue('\r         \nDetails of the error:'));
             error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
             console.log(chalk.blue('----------------------'));
-            throw new Error(error);
+            throw new Error(error.cmderr);
         }
     }
 
