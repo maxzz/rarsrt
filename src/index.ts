@@ -108,12 +108,20 @@ namespace appUtils {
     export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string) {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
-            process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
-            error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
-            process.stdout.write(chalk.yellow('Error details:\n'));
-            process.stdout.write(chalk.gray(error.stderr));
-            console.log(chalk.yellow('------------------'));
-            throw new Error(error.cmderr);
+            if (error.isMultilineSrt) {
+                let srtCnt = fs.readFileSync(fullNameSrt, 'utf8');
+                let lines = srtCnt.split(/\r?\n/).filter(Boolean);
+                fs.writeFileSync(fullNameSrt, lines.join('\r\n'));
+                error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
+            }
+            if (error) {
+                process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
+                error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
+                process.stdout.write(chalk.white('Error details:\n'));
+                process.stdout.write(chalk.gray(error.stderr));
+                console.log(chalk.white('------------------'));
+                throw new Error(error.cmderr);
+            }
         }
     }
 
