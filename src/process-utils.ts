@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-let cfg = require('../package.json');
 
 export async function exitProcess(exitCode: number, msg: string): Promise<void> {
     async function pressAnyKey(msg: string = '\nPress any key ...') {
@@ -31,14 +30,6 @@ export function newErrorArgs(msg: string): ErrorArgs {
     let error = new Error(msg) as ErrorArgs;
     error.args = true;
     return error;
-}
-
-export function help() {
-    let help = `
-${chalk.cyan('rarsrt')} utility will combine .SRT subtitles with .MP4 files inside specified folders..
-Version ${cfg.version}
-Usage: rarsrt <file(s).mp4> | <folder(s)>`;
-    console.log(help);
 }
 
 export namespace notes {
