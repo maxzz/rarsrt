@@ -79,49 +79,60 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
     });
 }
 
+type AnimationState = { animIndex: number; animations: string[]; };
+
+function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string, final: [string, MSPair][]) {
+    process.stdout.write(` ${
+        animationState.animations[animationState.animIndex++ % animationState.animations.length]
+    }${
+        animationState.animations[animationState.animIndex % animationState.animations.length]
+    }${
+        animationState.animations[(animationState.animIndex + 1) % animationState.animations.length]
+    }\r`);
+
+    let mp4 = path.join(targetFolder, `${shortMp4}`);
+    let srt = path.join(targetFolder, `${shortSrt}`);
+    let out = path.join(targetFolder, `temp-tm-temp.mp4`);
+
+    if (srt.length > 248) {
+        process.stdout.write(`   \r`);
+
+        notes.flushProcessed();
+        printFilenameLength(targetFolder, final);
+        let ss = removeIndent(`
+            The filename is too long (${srt.length} characters):
+            ${chalk.gray(srt)}
+            
+            ${chalk.yellow(`Rename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`)}`
+        ).replace(/^\r?\n/, '');
+        //let ss = `The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`;
+        throw Error(ss);
+    }
+
+    let result = appUtils.createFileMp4WithSrt(mp4, srt, out);
+    process.stdout.write(`   \r`);
+
+    if (!result?.skipped) {
+        rimraf.sync(srt);
+        rimraf.sync(mp4);
+        fs.renameSync(out, mp4);
+    }
+}
+
 export function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     let lastFolder = path.basename(targetFolder) || targetFolder;
 
     let msPairs: MSPairs = getMSPairs(targetFolder);
 
-    let animIndex = 0;
-    let animations = [".", "o", "O", "o"]; // TODO: write item of # items and current item name
-
-    function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
-        process.stdout.write(` ${animations[animIndex++ % animations.length]}${animations[animIndex % animations.length]}${animations[(animIndex + 1) % animations.length]}\r`);
-
-        let mp4 = path.join(targetFolder, `${shortMp4}`);
-        let srt = path.join(targetFolder, `${shortSrt}`);
-        let out = path.join(targetFolder, `temp-tm-temp.mp4`);
-
-        if (srt.length > 248) {
-            process.stdout.write(`   \r`);
-
-            notes.flushProcessed();
-            printFilenameLength(targetFolder, final);
-            let ss = removeIndent(`
-                The filename is too long (${srt.length} characters):
-                ${chalk.gray(srt)}
-                
-                ${chalk.yellow(`Rename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`)}`
-            ).replace(/^\r?\n/, '');
-            //let ss = `The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`;
-            throw Error(ss);
-        }
-
-        let result = appUtils.createFileMp4WithSrt(mp4, srt, out);
-        process.stdout.write(`   \r`);
-
-        if (!result?.skipped) {
-            rimraf.sync(srt);
-            rimraf.sync(mp4);
-            fs.renameSync(out, mp4);
-        }
-    }
+    const animationState: AnimationState = {
+        animIndex: 0,
+        animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
+    };
 
     let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
-    final.forEach(([name, pair]) => oneFileAction(targetFolder, pair.mp4, pair.srt, name));
+
+    final.forEach(([name, pair]) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, name, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
