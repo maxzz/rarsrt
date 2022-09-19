@@ -1,8 +1,8 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
-import { removeIndent } from './os-utils';
-import { notes } from './process-utils';
+import { removeIndent } from './utils-os';
+import { notes } from './app-notes';
 
 export namespace appUtils {
 

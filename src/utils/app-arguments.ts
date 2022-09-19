@@ -1,5 +1,5 @@
-import { exist } from './os-utils';
-import { newErrorArgs } from './process-utils';
+import { exist } from './utils-os';
+import { newErrorArgs } from './utils-errors';
 
 export function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
     let rv = {
