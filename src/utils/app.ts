@@ -24,10 +24,14 @@ export function handleFiles(filesToRar: string[]): void {
     */
 }
 
-export function handleFolder(targetFolder: string) {
-    // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
-    let lastFolder = path.basename(targetFolder) || targetFolder;
+type MSPair = { // mp4 and srt pair
+    mp4?: string;
+    srt?: string;
+};
 
+type MSPairs = Record<string, MSPair>;
+
+function getMSPairs(targetFolder: string): MSPairs {
     // 1. Get folders and files inside the target folder.
     let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
 
@@ -35,13 +39,6 @@ export function handleFolder(targetFolder: string) {
     type FItem = osStuff.fileItem & { ext: fnames.extType; };
 
     let fItems: FItem[] = filesAndFolders.files.map((_: osStuff.fileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
-
-    type MSPair = { // mp4 and srt pair
-        mp4?: string;
-        srt?: string;
-    };
-
-    type MSPairs = Record<string, MSPair>;
 
     let msPairs: MSPairs = {};
 
@@ -55,35 +52,44 @@ export function handleFolder(targetFolder: string) {
         }
     });
 
-    function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
-        let oneLong = final.filter(([name, pair]) => targetFolder.length + pair.srt.length > 248).length === 1;
+    return msPairs;
+}
+
+function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
+    let oneLong = final.filter(([name, pair]) => targetFolder.length + pair.srt.length > 248).length === 1;
+
+    let ss = removeIndent(`
+        ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is' : 'are'} too long.`)}
+        The maximum file name length must not exceed 248 characters.
+        The folder name is ${chalk.gray(`${targetFolder.length}`)} characters long, so ${chalk.gray(`${248 - targetFolder.length}`)} characters remain for the longest name in that folder.
         
-        let ss = removeIndent(`
-            ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is': 'are'} too long.`)}
-            The maximum file name length must not exceed 248 characters.
-            The folder name is ${chalk.gray(`${targetFolder.length}`)} characters long, so ${chalk.gray(`${248-targetFolder.length}`)} characters remain for the longest name in that folder.
-            
-            ${chalk.yellow('Folder:')}
-            ${targetFolder}
-            
-            ${chalk.yellow('The lengths of the filenames in the folder:')}
-                length | name
-                -------|------------------`);
-        console.log(ss);
+        ${chalk.yellow('Folder:')}
+        ${targetFolder}
         
-        final.forEach(([name, pair]) => {
-            let s = path.join(targetFolder, `${pair.srt}`);
-            let isLong = s.length > 248;
-            let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
-            console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srt}`);
-        });
-    }
+        ${chalk.yellow('The lengths of the filenames in the folder:')}
+            length | name
+            -------|------------------`);
+    console.log(ss);
+
+    final.forEach(([name, pair]) => {
+        let s = path.join(targetFolder, `${pair.srt}`);
+        let isLong = s.length > 248;
+        let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
+        console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srt}`);
+    });
+}
+
+export function handleFolder(targetFolder: string) {
+    // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
+    let lastFolder = path.basename(targetFolder) || targetFolder;
+
+    let msPairs: MSPairs = getMSPairs(targetFolder);
 
     let animIndex = 0;
     let animations = [".", "o", "O", "o"]; // TODO: write item of # items and current item name
-     
+
     function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string) {
-        process.stdout.write(` ${animations[animIndex++ % animations.length]}${animations[animIndex % animations.length]}${animations[(animIndex+1) % animations.length]}\r`);
+        process.stdout.write(` ${animations[animIndex++ % animations.length]}${animations[animIndex % animations.length]}${animations[(animIndex + 1) % animations.length]}\r`);
 
         let mp4 = path.join(targetFolder, `${shortMp4}`);
         let srt = path.join(targetFolder, `${shortSrt}`);
