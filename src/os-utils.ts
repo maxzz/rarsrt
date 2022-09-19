@@ -38,6 +38,7 @@ export namespace fnames {
         unity,   // '.unitypackage'
         txt,     // '.txt'
         srt,     // '.srt' subtitles
+        vtt,     // '.vtt' subtitles
         avi,     // '.avi' video
         mp4,     // '.mp4' video
         mkv,     // '.mkv' video
@@ -59,6 +60,7 @@ export namespace fnames {
         ['.unitypackage', extType.unity],
         ['.txt',          extType.txt],
         ['.srt',          extType.srt],
+        ['.vtt',          extType.vtt],
         ['.avi',          extType.avi],
         ['.mp4',          extType.mp4],
         ['.mkv',          extType.mkv],
