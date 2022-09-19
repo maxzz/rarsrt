@@ -1,3 +1,4 @@
+import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 import rimraf from 'rimraf';
@@ -29,7 +30,7 @@ type MSPair = { // mp4 and srt pair
     srt?: string;
 };
 
-type MSPairs = Record<string, MSPair>;
+type MSPairs = Record<string, MSPair>; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
 
 function getMSPairs(targetFolder: string): MSPairs {
     // 1. Get folders and files inside the target folder.
@@ -46,7 +47,8 @@ function getMSPairs(targetFolder: string): MSPairs {
         let base = path.parse(item.short).name;
         if (item.ext === fnames.extType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
-        } else if (item.ext === fnames.extType.srt) {
+        }
+        else if (item.ext === fnames.extType.srt) {
             base = base.replace(/\.en$/, ''); // handle case: 'name.en.srt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
@@ -82,13 +84,10 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
 type AnimationState = { animIndex: number; animations: string[]; };
 
 function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string, final: [string, MSPair][]) {
-    process.stdout.write(` ${
-        animationState.animations[animationState.animIndex++ % animationState.animations.length]
-    }${
-        animationState.animations[animationState.animIndex % animationState.animations.length]
-    }${
-        animationState.animations[(animationState.animIndex + 1) % animationState.animations.length]
-    }\r`);
+    process.stdout.write(` ${animationState.animations[animationState.animIndex++ % animationState.animations.length]
+        }${animationState.animations[animationState.animIndex % animationState.animations.length]
+        }${animationState.animations[(animationState.animIndex + 1) % animationState.animations.length]
+        }\r`);
 
     let mp4 = path.join(targetFolder, `${shortMp4}`);
     let srt = path.join(targetFolder, `${shortSrt}`);

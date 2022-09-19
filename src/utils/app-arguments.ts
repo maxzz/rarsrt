@@ -1,3 +1,4 @@
+import path from 'path';
 import { exist } from './utils-os';
 import { newErrorArgs } from './utils-errors';
 

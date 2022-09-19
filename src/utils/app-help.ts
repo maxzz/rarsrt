@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-let cfg = require('../package.json');
+let cfg = require('../../package.json');
 
 export function help() {
     let help = `
