@@ -25,9 +25,9 @@ export function handleFiles(filesToRar: string[]): void {
     */
 }
 
-type MSPair = { // mp4 and srt pair
-    mp4?: string;
-    srt?: string;
+type MSPair = {     // mp4 and srt pair
+    mp4?: string;   // short filename.mp4
+    srt?: string;   // short filename(.srt|.vtt)
 };
 
 type MSPairs = Record<string, MSPair>; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
@@ -50,6 +50,10 @@ function getMSPairs(targetFolder: string): MSPairs {
         }
         else if (item.ext === fnames.extType.srt) {
             base = base.replace(/\.en$/, ''); // handle case: 'name.en.srt'
+            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
+        }
+        else if (item.ext === fnames.extType.vtt) {
+            base = base.replace(/ English$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
     });
@@ -83,7 +87,7 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
 
 type AnimationState = { animIndex: number; animations: string[]; };
 
-function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, shortOut: string, final: [string, MSPair][]) {
+function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: [string, MSPair][]) {
     process.stdout.write(` ${animationState.animations[animationState.animIndex++ % animationState.animations.length]
         }${animationState.animations[animationState.animIndex % animationState.animations.length]
         }${animationState.animations[(animationState.animIndex + 1) % animationState.animations.length]
@@ -129,9 +133,9 @@ export function handleFolder(targetFolder: string) {
         animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
     };
 
-    let final: [string, MSPair][] = (Object.entries(msPairs)).filter((pair: [string, MSPair]) => pair[1].mp4 && pair[1].srt);
+    let final: [pairname: string, pair: MSPair][] = (Object.entries(msPairs)).filter(([_pairname, pair]) => pair.mp4 && pair.srt); //TODO: move it into getMSPairs()
 
-    final.forEach(([name, pair]) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, name, final));
+    final.forEach(([name, pair]) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
