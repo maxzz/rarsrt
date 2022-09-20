@@ -88,20 +88,12 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
 type AnimationState = { animIndex: number; animations: string[]; };
 
 function updateAnimation(st: AnimationState) {
-    process.stdout.write(
-        ` ${st.animations[st.animIndex++ % st.animations.length]
-        }${st.animations[st.animIndex % st.animations.length]
-        }${st.animations[(st.animIndex + 1) % st.animations.length]}\r`
-    );
+    const { animations: ani} = st;
+    const len = ani.length;
+    process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
 }
 
-function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: [string, MSPair][]) {
-    updateAnimation(animationState);
-
-    let mp4 = path.join(targetFolder, `${shortMp4}`);
-    let srt = path.join(targetFolder, `${shortSrt}`);
-    let out = path.join(targetFolder, `temp-tm-temp.mp4`);
-
+function checkMaxLength(targetFolder: string, srt: string, final: [string, MSPair][]) {
     if (srt.length > 248) {
         process.stdout.write(`   \r`);
 
@@ -117,6 +109,16 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
 
         throw Error(ss);
     }
+}
+
+function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: [string, MSPair][]) {
+    updateAnimation(animationState);
+
+    let mp4 = path.join(targetFolder, `${shortMp4}`);
+    let srt = path.join(targetFolder, `${shortSrt}`);
+    let out = path.join(targetFolder, `temp-tm-temp.mp4`);
+
+    checkMaxLength(targetFolder, srt, final);
 
     let result = appUtils.createFileMp4WithSrt(mp4, srt, out);
     process.stdout.write(`   \r`);
