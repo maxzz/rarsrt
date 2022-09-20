@@ -32,7 +32,7 @@ type MSPair = {     // mp4 and srt pair
 
 type MSPairs = Record<string, MSPair>; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
 
-function getMSPairs(targetFolder: string): MSPairs {
+function getMSPairs(targetFolder: string): MSPair[] {
     // 1. Get folders and files inside the target folder.
     let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
 
@@ -58,7 +58,8 @@ function getMSPairs(targetFolder: string): MSPairs {
         }
     }); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
-    return msPairs;
+    let final: MSPair[] = (Object.entries(msPairs)).map(([_pairname, pair]) => pair).filter((pair) => pair.mp4 && pair.srt);
+    return final;
 }
 
 function printFilenameLength(targetFolder: string, final: MSPair[]): void {
@@ -88,7 +89,7 @@ function printFilenameLength(targetFolder: string, final: MSPair[]): void {
 type AnimationState = { animIndex: number; animations: string[]; };
 
 function updateAnimation(st: AnimationState) {
-    const { animations: ani} = st;
+    const { animations: ani } = st;
     const len = ani.length;
     process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
 }
@@ -132,18 +133,16 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
 
 export function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
-    let lastFolder = path.basename(targetFolder) || targetFolder;
-
-    let msPairs: MSPairs = getMSPairs(targetFolder);
-
     const animationState: AnimationState = {
         animIndex: 0,
         animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
     };
 
-    let final: MSPair[] = (Object.entries(msPairs)).map(([_pairname, pair]) => pair).filter((pair) => pair.mp4 && pair.srt); //TODO: move it into getMSPairs()
+    let lastFolder = path.basename(targetFolder) || targetFolder;
 
-    final.forEach((pair) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, final));
+    let final: MSPair[] = getMSPairs(targetFolder);
+
+    final.forEach(({ mp4, srt }) => oneFileAction(animationState, targetFolder, mp4, srt, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
