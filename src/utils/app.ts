@@ -87,11 +87,16 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
 
 type AnimationState = { animIndex: number; animations: string[]; };
 
+function updateAnimation(st: AnimationState) {
+    process.stdout.write(
+        ` ${st.animations[st.animIndex++ % st.animations.length]
+        }${st.animations[st.animIndex % st.animations.length]
+        }${st.animations[(st.animIndex + 1) % st.animations.length]}\r`
+    );
+}
+
 function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: [string, MSPair][]) {
-    process.stdout.write(` ${animationState.animations[animationState.animIndex++ % animationState.animations.length]
-        }${animationState.animations[animationState.animIndex % animationState.animations.length]
-        }${animationState.animations[(animationState.animIndex + 1) % animationState.animations.length]
-        }\r`);
+    updateAnimation(animationState);
 
     let mp4 = path.join(targetFolder, `${shortMp4}`);
     let srt = path.join(targetFolder, `${shortSrt}`);
@@ -102,13 +107,14 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
 
         notes.flushProcessed();
         printFilenameLength(targetFolder, final);
+
         let ss = removeIndent(`
             The filename is too long (${srt.length} characters):
             ${chalk.gray(srt)}
             
             ${chalk.yellow(`Rename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`)}`
         ).replace(/^\r?\n/, '');
-        //let ss = `The filename is too long (${srt.length} characters):\n    ${srt}\n\nRename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`;
+
         throw Error(ss);
     }
 
