@@ -27,7 +27,7 @@ export function handleFiles(filesToRar: string[]): void {
 
 type MSPair = {     // mp4 and srt pair
     mp4?: string;   // short filename.mp4
-    srt?: string;   // short filename(.srt|.vtt)
+    srt?: string;   // short filename[(_en| English)](.srt|.vtt)
 };
 
 type MSPairs = Record<string, MSPair>; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
@@ -61,8 +61,8 @@ function getMSPairs(targetFolder: string): MSPairs {
     return msPairs;
 }
 
-function printFilenameLength(targetFolder: string, final: [string, MSPair][]): void {
-    let oneLong = final.filter(([name, pair]) => targetFolder.length + pair.srt.length > 248).length === 1;
+function printFilenameLength(targetFolder: string, final: MSPair[]): void {
+    let oneLong = final.filter((pair) => targetFolder.length + pair.srt.length > 248).length === 1;
 
     let ss = removeIndent(`
         ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is' : 'are'} too long.`)}
@@ -77,7 +77,7 @@ function printFilenameLength(targetFolder: string, final: [string, MSPair][]): v
             -------|------------------`);
     console.log(ss);
 
-    final.forEach(([name, pair]) => {
+    final.forEach((pair) => {
         let s = path.join(targetFolder, `${pair.srt}`);
         let isLong = s.length > 248;
         let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
@@ -93,7 +93,7 @@ function updateAnimation(st: AnimationState) {
     process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
 }
 
-function checkMaxLength(targetFolder: string, srt: string, final: [string, MSPair][]) {
+function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {
         process.stdout.write(`   \r`);
 
@@ -111,7 +111,7 @@ function checkMaxLength(targetFolder: string, srt: string, final: [string, MSPai
     }
 }
 
-function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: [string, MSPair][]) {
+function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
     updateAnimation(animationState);
 
     let mp4 = path.join(targetFolder, `${shortMp4}`);
@@ -141,9 +141,9 @@ export function handleFolder(targetFolder: string) {
         animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
     };
 
-    let final: [pairname: string, pair: MSPair][] = (Object.entries(msPairs)).filter(([_pairname, pair]) => pair.mp4 && pair.srt); //TODO: move it into getMSPairs()
+    let final: MSPair[] = (Object.entries(msPairs)).map(([_pairname, pair]) => pair).filter((pair) => pair.mp4 && pair.srt); //TODO: move it into getMSPairs()
 
-    final.forEach(([name, pair]) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, final));
+    final.forEach((pair) => oneFileAction(animationState, targetFolder, pair.mp4, pair.srt, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
