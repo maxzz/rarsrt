@@ -30,8 +30,6 @@ type MSPair = {     // mp4 and srt pair
     srt?: string;   // short filename[(_en| English)](.srt|.vtt)
 };
 
-type MSPairs = Record<string, MSPair>; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
-
 function getMSPairs(targetFolder: string): MSPair[] {
     // 1. Get folders and files inside the target folder.
     let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
@@ -41,7 +39,7 @@ function getMSPairs(targetFolder: string): MSPair[] {
 
     let fItems: FItem[] = filesAndFolders.files.map((_: osStuff.fileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
 
-    let msPairs: MSPairs = {};
+    let msPairs: Record<string, MSPair> = {}; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
 
     fItems.forEach((item: FItem) => {
         let base = path.parse(item.short).name;
@@ -58,8 +56,7 @@ function getMSPairs(targetFolder: string): MSPair[] {
         }
     }); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
-    let final: MSPair[] = (Object.entries(msPairs)).map(([_pairname, pair]) => pair).filter((pair) => pair.mp4 && pair.srt);
-    return final;
+    return (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
 }
 
 function printFilenameLength(targetFolder: string, final: MSPair[]): void {
