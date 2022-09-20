@@ -53,10 +53,10 @@ function getMSPairs(targetFolder: string): MSPairs {
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
         else if (item.ext === fnames.extType.vtt) {
-            base = base.replace(/ English$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
+            base = base.replace(/ English$/i, '').replace(/_en$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
-    });
+    }); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
     return msPairs;
 }
