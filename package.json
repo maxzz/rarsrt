@@ -1,6 +1,6 @@
 {
     "name": "rarsrt",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "author": "Max Zakharzhevskiy",
     "description": "Utility to combine .SRT subtitles with .MP4 files inside specified folders.",
     "license": "MIT",
