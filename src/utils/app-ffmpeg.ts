@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { removeIndent } from './utils-os';
 import { notes } from './app-notes';
 
-export namespace appUtils {
+export namespace mpegUtils {
 
     let FFMPEG: string;
 
@@ -82,4 +82,4 @@ export namespace appUtils {
         }
     }
 
-} //namespace appUtils
+} //namespace mpegUtils

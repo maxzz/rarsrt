@@ -1,16 +1,15 @@
 import path from 'path';
 import chalk from 'chalk';
 import { exitProcess, newErrorArgs } from './utils/utils-errors';
-import { OsStuff } from './utils/utils-os-stuff';
 import { help } from './utils/app-help';
 import { notes } from './utils/app-notes';
-import { appUtils } from './utils/app-ffmpeg';
+import { mpegUtils } from './utils/app-ffmpeg';
 import { getTargets } from './utils/app-arguments';
 import { handleFiles, handleFolders } from './utils/app';
 import { Targets } from './utils/app-types';
 
 async function main() {
-    appUtils.findFFMpeg();
+    mpegUtils.findFFMpeg();
 
     const targets: Targets = getTargets();
 
