@@ -1,40 +1,40 @@
 import path from 'path';
 import fs from 'fs';
 
-export namespace osStuff {
+export namespace OsStuff {
 
-    export type fileItem = {
+    export type FileItem = {
         short: string;      // filename wo/ path
         btime: Date;        // file created (birthtime) timestamp
         mtime?: Date;       // file data modified timestamp; present if different from btime
         size: number;       // file size
     };
 
-    export type folderItem = {
+    export type FolderItem = {
         name: string;       // Folder full name
-        files: fileItem[];  // Short filenames i.e. wo/ path.
-        subs: folderItem[]; // Sub-folders.
+        files: FileItem[];  // Short filenames i.e. wo/ path.
+        subs: FolderItem[]; // Sub-folders.
     };
 
-    function collectFiles(dir: string, rv: folderItem, recursive: boolean): void {
-        rv.files.push(...fs.readdirSync(dir).map((_) => {
-            let fname = path.join(dir, _);
-            let st = fs.statSync(fname);
+    function recursivelyCollectFiles(dir: string, rv: FolderItem, recursive: boolean): void {
+        rv.files.push(...fs.readdirSync(dir).map((shortname) => {
+            const fullname = path.join(dir, shortname);
+            const st = fs.statSync(fullname);
             if (st.isDirectory()) {
                 if (recursive) {
-                    let newFolder: folderItem = {
-                        name: fname,
+                    let newFolder: FolderItem = {
+                        name: fullname,
                         files: [],
                         subs: [],
                     };
-                    collectFiles(fname, newFolder, recursive);
+                    recursivelyCollectFiles(fullname, newFolder, recursive);
                     if (newFolder.files.length || newFolder.subs.length) {
                         rv.subs.push(newFolder);
                     }
                 }
             } else if (st.isFile()) {
-                let newFile: fileItem = {
-                    short: _,
+                let newFile: FileItem = {
+                    short: shortname,
                     btime: st.birthtime,
                     ...(st.birthtime !== st.mtime && { mtime: st.mtime }),
                     size: st.size,
@@ -44,14 +44,14 @@ export namespace osStuff {
         }).filter(Boolean));
     }
 
-    export function collectDirItems(dir: string): folderItem {
-        let rv: folderItem = {
+    export function collectDirItems(dir: string): FolderItem {
+        let rv: FolderItem = {
             name: dir,
             files: [],
             subs: [],
         };
-        collectFiles(dir, rv, true);
+        recursivelyCollectFiles(dir, rv, true);
         return rv;
     }
 
-} //namespace osStuff
+} //namespace OsStuff
