@@ -9,19 +9,17 @@ import { checkArg } from './utils/app-arguments';
 import { handleFiles, handleFolders } from './utils/app';
 import { Targets } from './utils/app-types';
 
-async function main() {
-    appUtils.findFFMpeg();
-
+function getTargets(): Targets {
     // console.log('args', JSON.stringify(process.argv.slice(2), null, 4));
     // await exitProcess(0, '');
 
-    let args = require('minimist')(process.argv.slice(2), {
+    const args = require('minimist')(process.argv.slice(2), {
     });
 
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
 
-    let targets: Targets = checkArg(args._ || []);
+    const targets: Targets = checkArg(args._ || []);
 
     if (targets.dirs.length === 1 && !targets.files.length) {
         // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
@@ -31,6 +29,14 @@ async function main() {
 
     // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
     // await exitProcess(0, '');
+
+    return targets;
+}
+
+async function main() {
+    appUtils.findFFMpeg();
+
+    const targets: Targets = getTargets();
 
     if (targets.files.length) {
         handleFiles([...targets.files, ...targets.dirs]);
