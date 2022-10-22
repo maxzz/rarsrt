@@ -1,8 +1,9 @@
 import path from 'path';
 import { exist } from './utils-os';
 import { newErrorArgs } from './utils-errors';
+import { Targets } from './app-types';
 
-export function checkArg(argTargets: string[]): { files: string[]; dirs: string[]; } {
+export function checkArg(argTargets: string[]): Targets {
     let rv = {
         files: [],
         dirs: [],

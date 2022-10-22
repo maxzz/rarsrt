@@ -1,12 +1,13 @@
 import path from 'path';
 import chalk from 'chalk';
 import { exitProcess, newErrorArgs } from './utils/utils-errors';
-import { osStuff } from './utils/utils-os-stuff';
+import { OsStuff } from './utils/utils-os-stuff';
 import { help } from './utils/app-help';
 import { notes } from './utils/app-notes';
 import { appUtils } from './utils/app-ffmpeg';
 import { checkArg } from './utils/app-arguments';
 import { handleFiles, handleFolder } from './utils/app';
+import { Targets } from './utils/app-types';
 
 async function main() {
     appUtils.findFFMpeg();
@@ -20,12 +21,12 @@ async function main() {
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
 
-    let targets = checkArg(args._ || []);
+    let targets: Targets = checkArg(args._ || []);
 
     // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
     if (targets.dirs.length === 1 && !targets.files.length) {
-        let rootFolders: osStuff.folderItem = osStuff.collectDirItems(targets.dirs[0]); // one of cases with 'rarsrt .'
-        targets.dirs.push(...rootFolders.subs.map((_: osStuff.folderItem) => _.name));
+        let rootFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targets.dirs[0]); // one of cases with 'rarsrt .'
+        targets.dirs.push(...rootFolders.subs.map((_: OsStuff.FolderItem) => _.name));
     }
 
     // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
@@ -59,3 +60,6 @@ main().catch(async (error) => {
     let errorMsg = `${notes.buildMessage()}${chalk[error.args ? 'yellow' : 'red'](`\n${error.message}`)}`;
     await exitProcess(1, errorMsg);
 });
+
+//TODO: add option for encoding .srt files: win1251 -> utf8
+//TODO: handle .avi files as well?

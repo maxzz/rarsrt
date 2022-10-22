@@ -3,7 +3,7 @@ import fs from 'fs';
 import chalk from 'chalk';
 import rimraf from 'rimraf';
 import { fnames, removeIndent } from './utils-os';
-import { osStuff } from './utils-os-stuff';
+import { OsStuff } from './utils-os-stuff';
 import { notes } from './app-notes';
 import { appUtils } from './app-ffmpeg';
 
@@ -32,12 +32,12 @@ type MSPair = {     // mp4 and srt pair
 
 function getMSPairs(targetFolder: string): MSPair[] {
     // 1. Get folders and files inside the target folder.
-    let filesAndFolders: osStuff.folderItem = osStuff.collectDirItems(targetFolder);
+    let filesAndFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targetFolder);
 
     // 2. Get what we have inside this folder.
-    type FItem = osStuff.fileItem & { ext: fnames.extType; };
+    type FItem = OsStuff.FileItem & { ext: fnames.extType; };
 
-    let fItems: FItem[] = filesAndFolders.files.map((_: osStuff.fileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
+    let fItems: FItem[] = filesAndFolders.files.map((_: OsStuff.FileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
 
     let msPairs: Record<string, MSPair> = {}; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
 
