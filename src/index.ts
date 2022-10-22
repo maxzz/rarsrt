@@ -3,13 +3,13 @@ import chalk from 'chalk';
 import { exitProcess, newErrorArgs } from './utils/utils-errors';
 import { help } from './utils/app-help';
 import { notes } from './utils/app-notes';
-import { mpegUtils } from './utils/app-ffmpeg';
+import { ffmpegUtils } from './utils/utils-ffmpeg';
 import { getTargets } from './utils/app-arguments';
 import { handleFiles, handleFolders } from './utils/app';
 import { Targets } from './utils/app-types';
 
 async function main() {
-    mpegUtils.findFFMpeg();
+    ffmpegUtils.findFFMpeg();
 
     const targets: Targets = getTargets();
 

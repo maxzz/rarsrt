@@ -5,9 +5,17 @@ import chalk from 'chalk';
 import { removeIndent } from './utils-os';
 import { notes } from './app-notes';
 
-export namespace mpegUtils {
+export namespace ffmpegUtils {
 
     let FFMPEG: string;
+
+    export function findFFMpeg() {
+        try {
+            FFMPEG = execSync(`where ffmpeg`).toString().split(/[\r\n]/)[0];
+        } catch (error) {
+            throw new Error(`${error}\nMake path to ffmpeg.exe as part of PATH`);
+        }
+    }
 
     function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error') : { stderr: string, cmderr: string, isMultilineSrt: boolean } | undefined {
         // -y is to overwrite destination file.
@@ -24,12 +32,12 @@ export namespace mpegUtils {
         } catch (error) {
             let isMultilineSrt = false;
 
-            let childError: string = error.stderr.toString();
+            const childError: string = error.stderr.toString();
             if (childError.match(/\.srt: Invalid data found when processing input/)) {
                 isMultilineSrt = true;
             }
 
-            let s = chalk.gray(removeIndent(`
+            const errMsg = chalk.gray(removeIndent(`
                 ${chalk.yellow('Failed to proceed:')}
                     ${path.basename(fullNameMp4)}
                     ${path.basename(fullNameSrt)}
@@ -38,10 +46,10 @@ export namespace mpegUtils {
                 ${path.dirname(fullNameSrt)}
                 ${chalk.yellow('Command:')}
                 ${cmd}`).replace(/^\r?\n/, ''));
-            
+
             return {
                 stderr: childError,
-                cmderr: s,
+                cmderr: errMsg,
                 isMultilineSrt,
             };
         }
@@ -74,12 +82,4 @@ export namespace mpegUtils {
         }
     }
 
-    export function findFFMpeg() {
-        try {
-            FFMPEG = execSync(`where ffmpeg`).toString().split(/[\r\n]/)[0];
-        } catch (error) {
-            throw new Error(`${error}\nMake path to ffmpeg.exe as part of PATH`);
-        }
-    }
-
-} //namespace mpegUtils
+} //namespace ffmpegUtils

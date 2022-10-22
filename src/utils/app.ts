@@ -5,7 +5,7 @@ import rimraf from 'rimraf';
 import { fnames, removeIndent } from './utils-os';
 import { OsStuff } from './utils-os-stuff';
 import { notes } from './app-notes';
-import { mpegUtils } from './app-ffmpeg';
+import { ffmpegUtils } from './utils-ffmpeg';
 import { newErrorArgs } from './utils-errors';
 
 export function handleFiles(filesToRar: string[]): void {
@@ -122,7 +122,7 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
 
     checkMaxLength(targetFolder, srt, final);
 
-    let result = mpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
+    let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
     process.stdout.write(`   \r`);
 
     if (!result?.skipped) {

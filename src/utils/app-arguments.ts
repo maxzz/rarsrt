@@ -39,8 +39,8 @@ export function getTargets(): Targets {
 
     const targets: Targets = checkArg(args._ || []);
 
-    if (targets.dirs.length === 1 && !targets.files.length) {
-        // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
+    const isSingleFolderToProcess = targets.dirs.length === 1 && !targets.files.length; // If we have a single top folder (and no top files w/ drag&drop) then check what we have inside.
+    if (isSingleFolderToProcess) {
         let rootFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targets.dirs[0]); // one of cases with 'rarsrt .'
         targets.dirs.push(...rootFolders.subs.map((_: OsStuff.FolderItem) => _.name));
     }
