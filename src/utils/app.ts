@@ -6,8 +6,12 @@ import { fnames, removeIndent } from './utils-os';
 import { OsStuff } from './utils-os-stuff';
 import { notes } from './app-notes';
 import { appUtils } from './app-ffmpeg';
+import { newErrorArgs } from './utils-errors';
 
 export function handleFiles(filesToRar: string[]): void {
+    // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
+    throw newErrorArgs('Separate handling of filenames has not yet been implemented');
+    
     // 0. Simulate rardir behaviour. Files should be in the same folder.
     /*
         let root = path.dirname(filesToRar[0]);
@@ -128,7 +132,7 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
     }
 }
 
-export function handleFolder(targetFolder: string) {
+function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animationState: AnimationState = {
         animIndex: 0,
@@ -142,4 +146,10 @@ export function handleFolder(targetFolder: string) {
     final.forEach(({ mp4, srt }) => oneFileAction(animationState, targetFolder, mp4, srt, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
+}
+
+export function handleFolders(dirs: string[]) {
+    for (let dir of dirs) {
+        handleFolder(dir);
+    }
 }

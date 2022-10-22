@@ -6,7 +6,7 @@ import { help } from './utils/app-help';
 import { notes } from './utils/app-notes';
 import { appUtils } from './utils/app-ffmpeg';
 import { checkArg } from './utils/app-arguments';
-import { handleFiles, handleFolder } from './utils/app';
+import { handleFiles, handleFolders } from './utils/app';
 import { Targets } from './utils/app-types';
 
 async function main() {
@@ -23,8 +23,8 @@ async function main() {
 
     let targets: Targets = checkArg(args._ || []);
 
-    // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
     if (targets.dirs.length === 1 && !targets.files.length) {
+        // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
         let rootFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targets.dirs[0]); // one of cases with 'rarsrt .'
         targets.dirs.push(...rootFolders.subs.map((_: OsStuff.FolderItem) => _.name));
     }
@@ -33,13 +33,9 @@ async function main() {
     // await exitProcess(0, '');
 
     if (targets.files.length) {
-        throw newErrorArgs('Separate handling of filenames has not yet been implemented');
-
-        handleFiles([...targets.files, ...targets.dirs]); // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
+        handleFiles([...targets.files, ...targets.dirs]);
     } else if (targets.dirs.length) {
-        for (let dir of targets.dirs) {
-            handleFolder(dir);
-        }
+        handleFolders(targets.dirs);
     } else {
         throw newErrorArgs(`Specify at leats one folder or files name to process`);
     }
