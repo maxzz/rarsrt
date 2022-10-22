@@ -2,8 +2,9 @@ import path from 'path';
 import { exist } from './utils-os';
 import { newErrorArgs } from './utils-errors';
 import { Targets } from './app-types';
+import { OsStuff } from './utils-os-stuff';
 
-export function checkArg(argTargets: string[]): Targets {
+function checkArg(argTargets: string[]): Targets {
     let rv = {
         files: [],
         dirs: [],
@@ -24,4 +25,28 @@ export function checkArg(argTargets: string[]): Targets {
     }
 
     return rv;
+}
+
+export function getTargets(): Targets {
+    // console.log('args', JSON.stringify(process.argv.slice(2), null, 4));
+    // await exitProcess(0, '');
+
+    const args = require('minimist')(process.argv.slice(2), {
+    });
+
+    //console.log(`args ${JSON.stringify(args, null, 4)}`);
+    //await exitProcess(0, '');
+
+    const targets: Targets = checkArg(args._ || []);
+
+    if (targets.dirs.length === 1 && !targets.files.length) {
+        // If we have a single top folder and no top files w/ drag&drop then check what we have inside.
+        let rootFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targets.dirs[0]); // one of cases with 'rarsrt .'
+        targets.dirs.push(...rootFolders.subs.map((_: OsStuff.FolderItem) => _.name));
+    }
+
+    // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
+    // await exitProcess(0, '');
+
+    return targets;
 }
