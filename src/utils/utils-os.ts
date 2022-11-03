@@ -25,7 +25,7 @@ export function toWindows(fileName: string): string {
 
 export namespace fnames {
 
-    export const enum extType {
+    export const enum ExtType {
         unk,     // Not interested for us.
         empty,   // No file extension at all.
 
@@ -47,31 +47,31 @@ export namespace fnames {
     export type fileItem = { // This is only file name wo/ path and extension, plus type of file extension.
         short: string;      // Original filename wo/ path.
         name: string;       // File name wo/ extension and path.
-        ext: extType;       // File extension type of this file name.
+        ext: ExtType;       // File extension type of this file name.
     }
 
     let extTypes = new Map([
-        ['.rar',          extType.rar],
-        ['.zip',          extType.zip],
-        ['.torrent',      extType.tor],
-        ['.url',          extType.url],
-        ['.mht',          extType.mht],
-        ['.pdf',          extType.pdf],
-        ['.unitypackage', extType.unity],
-        ['.txt',          extType.txt],
-        ['.srt',          extType.srt],
-        ['.vtt',          extType.vtt],
-        ['.avi',          extType.avi],
-        ['.mp4',          extType.mp4],
-        ['.mkv',          extType.mkv],
+        ['.rar',          ExtType.rar],
+        ['.zip',          ExtType.zip],
+        ['.torrent',      ExtType.tor],
+        ['.url',          ExtType.url],
+        ['.mht',          ExtType.mht],
+        ['.pdf',          ExtType.pdf],
+        ['.unitypackage', ExtType.unity],
+        ['.txt',          ExtType.txt],
+        ['.srt',          ExtType.srt],
+        ['.vtt',          ExtType.vtt],
+        ['.avi',          ExtType.avi],
+        ['.mp4',          ExtType.mp4],
+        ['.mkv',          ExtType.mkv],
     ]);
 
-    export function castFileExtension(ext: string): extType {
+    export function castFileExtension(ext: string): ExtType {
         ext = ext.trim();
         if (ext === '.' || ext === '') {
-            return extType.empty;
+            return ExtType.empty;
         }
-        return extTypes.get(ext.toLowerCase()) || extType.unk;
+        return extTypes.get(ext.toLowerCase()) || ExtType.unk;
     }
     
 } //namespace fnames

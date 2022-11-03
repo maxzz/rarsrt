@@ -40,7 +40,7 @@ function getMSPairs(targetFolder: string): MSPair[] {
     let filesAndFolders: OsStuff.FolderItem = OsStuff.collectDirItems(targetFolder);
 
     // 2. Get what we have inside this folder.
-    type FItem = OsStuff.FileItem & { ext: fnames.extType; };
+    type FItem = OsStuff.FileItem & { ext: fnames.ExtType; };
 
     let fItems: FItem[] = filesAndFolders.files.map((_: OsStuff.FileItem) => ({ ..._, ext: fnames.castFileExtension(path.extname(_.short)) }));
 
@@ -48,14 +48,14 @@ function getMSPairs(targetFolder: string): MSPair[] {
 
     fItems.forEach((item: FItem) => {
         let base = path.parse(item.short).name;
-        if (item.ext === fnames.extType.mp4) {
+        if (item.ext === fnames.ExtType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
         }
-        else if (item.ext === fnames.extType.srt) {
+        else if (item.ext === fnames.ExtType.srt) {
             base = base.replace(/\.en$/, ''); // handle case: 'name.en.srt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
-        else if (item.ext === fnames.extType.vtt) {
+        else if (item.ext === fnames.ExtType.vtt) {
             base = base.replace(/ English$/i, '').replace(/_en$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
