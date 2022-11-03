@@ -2,11 +2,11 @@ import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 import rimraf from 'rimraf';
-import { fnames, removeIndent } from './utils-os';
-import { OsStuff } from './utils-os-stuff';
+import { fnames, removeIndent } from '../utils/utils-os';
+import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
 import { ffmpegUtils } from './utils-ffmpeg';
-import { newErrorArgs } from './utils-errors';
+import { newErrorArgs } from '../utils/utils-errors';
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).

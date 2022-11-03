@@ -1,8 +1,8 @@
 import path from 'path';
-import { exist } from './utils-os';
-import { newErrorArgs } from './utils-errors';
+import { exist } from '../utils/utils-os';
+import { newErrorArgs } from '../utils/utils-errors';
 import { Targets } from './app-types';
-import { OsStuff } from './utils-os-stuff';
+import { OsStuff } from '../utils/utils-os-stuff';
 
 function checkArg(argTargets: string[]): Targets {
     let rv = {

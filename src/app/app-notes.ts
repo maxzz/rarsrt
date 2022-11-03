@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { exitProcess } from './utils-errors';
+import { exitProcess } from '../utils/utils-errors';
 
 export namespace notes {
     let messages: string[] = []; // messages will be shown if any warnings happen.
