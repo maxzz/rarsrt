@@ -52,7 +52,7 @@ function getMSPairs(targetFolder: string): MSPair[] {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
         }
         else if (item.ext === fnames.ExtType.srt) {
-            base = base.replace(/\.en$/, ''); // handle case: 'name.en.srt'
+            base = base.replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name.en.srt' and 'name_en.srt'
             (msPairs[base] || (msPairs[base] = {})).srt = item.short;
         }
         else if (item.ext === fnames.ExtType.vtt) {
