@@ -137,7 +137,7 @@ function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animationState: AnimationState = {
         animIndex: 0,
-        animations: [".", "_", "o", "O", "o"], // TODO: write item of # items and current item name
+        animations: [".", "_", "_", "_", "o", "O", "o", "_", "_", "_"], // TODO: write item of # items and current item name
     };
 
     let lastFolder = path.basename(targetFolder) || targetFolder;
@@ -154,3 +154,5 @@ export function handleFolders(dirs: string[]) {
         handleFolder(dir);
     }
 }
+
+//add global node-vtt-to-srt //https://www.npmjs.com/package/node-vtt-to-srt (vtt-to-srt will not work): 'node-vtt-to-srt lesson01.srt < lesson01.vtt'
