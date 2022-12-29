@@ -137,7 +137,7 @@ function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animationState: AnimationState = {
         animIndex: 0,
-        animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
+        animations: [".", "_", "o", "O", "o"], // TODO: write item of # items and current item name
     };
 
     let lastFolder = path.basename(targetFolder) || targetFolder;
