@@ -137,7 +137,7 @@ function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animationState: AnimationState = {
         animIndex: 0,
-        animations: [".", "_", "_", "_", "o", "O", "o", "_", "_", "_"], // TODO: write item of # items and current item name
+        animations: [".", "o", "O", "o", ".", "o", "O", "o", ".", "_"], // TODO: write item of # items and current item name
     };
 
     let lastFolder = path.basename(targetFolder) || targetFolder;
@@ -156,3 +156,6 @@ export function handleFolders(dirs: string[]) {
 }
 
 //add global node-vtt-to-srt //https://www.npmjs.com/package/node-vtt-to-srt (vtt-to-srt will not work): 'node-vtt-to-srt lesson01.srt < lesson01.vtt'
+
+//TBD: if folder has N of mp4 and N of str(or vtt) then we can match on first M matching characters (from srt or mp4 filename).
+//  like 43 - 31564200.mp4 and 43 - E2E Tests English.vtt
