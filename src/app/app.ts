@@ -100,6 +100,10 @@ function updateAnimation(st: AnimationState) {
         ani[(st.animIndex + 1) % len],
         ani[(st.animIndex + 2) % len],
         ani[(st.animIndex + 3) % len],
+
+        ani[(st.animIndex + 1 + 1) % len],
+        ani[(st.animIndex + 1 + 2) % len],
+        ani[(st.animIndex + 1 + 3) % len],
         '\r',
     ];
     const str = arr.join('');
@@ -165,7 +169,9 @@ export function handleFolders(dirs: string[]) {
     }
 }
 
-//add global node-vtt-to-srt //https://www.npmjs.com/package/node-vtt-to-srt (vtt-to-srt will not work): 'node-vtt-to-srt lesson01.srt < lesson01.vtt'
+//added global node-vtt-to-srt //https://www.npmjs.com/package/node-vtt-to-srt (vtt-to-srt will not work): 'node-vtt-to-srt lesson01.srt < lesson01.vtt'
 
 //TBD: if folder has N of mp4 and N of str(or vtt) then we can match on first M matching characters (from srt or mp4 filename).
 //  like 43 - 31564200.mp4 and 43 - E2E Tests English.vtt
+
+//TODO: coursehunter: write content file as ansi file with coding page 1251
