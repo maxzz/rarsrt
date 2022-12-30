@@ -93,7 +93,19 @@ type AnimationState = { animIndex: number; animations: string[]; };
 function updateAnimation(st: AnimationState) {
     const { animations: ani } = st;
     const len = ani.length;
-    process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
+    // process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
+    
+    // const str = ` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`;
+    // process.stdout.write(str);
+
+    const arr = [
+        ani[st.animIndex++ % len],
+        ani[st.animIndex % len],
+        ani[(st.animIndex + 1) % len],
+        '\r',
+    ]
+    const str = arr.join('');
+    process.stdout.write(str);
 }
 
 function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
@@ -137,8 +149,7 @@ function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animationState: AnimationState = {
         animIndex: 0,
-        // animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
-        animations: [".", ".", "o", "o", "O", "O", "o", "o"], // TODO: write item of # items and current item name
+        animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
     };
 
     let lastFolder = path.basename(targetFolder) || targetFolder;
