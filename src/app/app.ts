@@ -12,7 +12,7 @@ import { newErrorArgs } from '../utils/utils-errors';
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
     throw newErrorArgs('Separate handling of filenames has not yet been implemented');
-    
+
     // 0. Simulate rardir behaviour. Files should be in the same folder.
     /*
         let root = path.dirname(filesToRar[0]);
@@ -94,16 +94,14 @@ function updateAnimation(st: AnimationState) {
     const { animations: ani } = st;
     const len = ani.length;
     // process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
-    
-    // const str = ` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`;
-    // process.stdout.write(str);
-
+    st.animIndex++;
     const arr = [
-        ani[st.animIndex++ % len],
         ani[st.animIndex % len],
         ani[(st.animIndex + 1) % len],
+        ani[(st.animIndex + 2) % len],
+        ani[(st.animIndex + 3) % len],
         '\r',
-    ]
+    ];
     const str = arr.join('');
     process.stdout.write(str);
 }
