@@ -8,6 +8,7 @@ import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
 import { ffmpegUtils } from './utils-ffmpeg';
 import { newErrorArgs } from '../utils/utils-errors';
+import { ConvertAction, convertVttToSrt } from '../utils/utils-vtt';
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
@@ -128,6 +129,20 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     }
 }
 
+function checkVttFormat(fullFname: string) {
+    const isVtt = path.extname(fullFname).toLowerCase() === '.vtt';
+    if (!isVtt) {
+        return;
+    }
+
+    const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+    const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
+
+    if (newCnt.hasFixes) {
+        fs.writeFileSync(fullFname, newCnt.newContent);
+    }
+}
+
 function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
     updateAnimation(animationState);
 
@@ -136,6 +151,7 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
     let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
     checkMaxLength(targetFolder, srt, final);
+    checkVttFormat(srt);
 
     let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
     process.stdout.write(`   \r`);
