@@ -68,7 +68,12 @@ export namespace ffmpegUtils {
             if (error) {
                 // If did not recovered the bad srt file formatting then report but continue with other files.
                 if (error.isMultilineSrt) {
-                    notes.add(chalk.red(`* Skipped file merge (bad .srt format):\n  Folder: ${path.dirname(fullNameSrt)}\n    File: ${path.basename(fullNameSrt)}`));
+                    const msg = [
+                        chalk.red(`* Skipped file merge (bad .srt format):`),
+                        chalk.gray(`  Folder:\n  ${path.dirname(fullNameSrt)}`),
+                        chalk.gray(`  File:\n  ${path.basename(fullNameSrt)}`),
+                    ].join('\n');
+                    notes.add(msg);
                     return { skipped: true };
                 } else {
                     process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));

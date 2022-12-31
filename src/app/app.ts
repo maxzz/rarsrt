@@ -101,9 +101,9 @@ function updateAnimation(st: AnimationState) {
         ani[(st.animIndex + 2) % len],
         ani[(st.animIndex + 3) % len],
 
-        ani[(st.animIndex + 1 + 1) % len],
-        ani[(st.animIndex + 1 + 2) % len],
-        ani[(st.animIndex + 1 + 3) % len],
+        // ani[(st.animIndex + 1 + 1) % len],
+        // ani[(st.animIndex + 1 + 2) % len],
+        // ani[(st.animIndex + 1 + 3) % len],
         '\r',
     ];
     const str = arr.join('');
@@ -175,3 +175,5 @@ export function handleFolders(dirs: string[]) {
 //  like 43 - 31564200.mp4 and 43 - E2E Tests English.vtt
 
 //TODO: coursehunter: write content file as ansi file with coding page 1251
+
+//TODO: remove srt and vtt pairs after merge is successful
