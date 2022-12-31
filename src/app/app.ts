@@ -157,9 +157,9 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
     process.stdout.write(`   \r`);
 
     if (!result.skipped) {
-        rimraf.sync(srt);
         rimraf.sync(mp4);
         fs.renameSync(out, mp4);
+        rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
     }
 }
 

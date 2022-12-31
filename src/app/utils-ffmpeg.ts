@@ -86,9 +86,7 @@ export namespace ffmpegUtils {
                 }
             }
         }
-        if (error) {
-            return { skipped: !!error };
-        }
+        return { skipped: !!error };
     }
 
 } //namespace ffmpegUtils
