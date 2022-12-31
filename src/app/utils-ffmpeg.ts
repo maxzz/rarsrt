@@ -55,9 +55,10 @@ export namespace ffmpegUtils {
         }
     }
 
-    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean } | undefined {
+    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean } {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
+
             // Try to recover the bad srt file formatting.
             if (error.isMultilineSrt) {
                 let srtCnt = fs.readFileSync(fullNameSrt, 'utf8');
@@ -65,6 +66,7 @@ export namespace ffmpegUtils {
                 fs.writeFileSync(fullNameSrt, lines.join('\r\n'));
                 error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
             }
+
             if (error) {
                 // If did not recovered the bad srt file formatting then report but continue with other files.
                 if (error.isMultilineSrt) {
@@ -74,7 +76,6 @@ export namespace ffmpegUtils {
                         chalk.gray(`  File:\n  ${path.basename(fullNameSrt)}`),
                     ].join('\n');
                     notes.add(msg);
-                    return { skipped: true };
                 } else {
                     process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
                     error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
@@ -84,6 +85,9 @@ export namespace ffmpegUtils {
                     throw new Error(error.cmderr);
                 }
             }
+        }
+        if (error) {
+            return { skipped: !!error };
         }
     }
 

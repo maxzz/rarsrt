@@ -102,7 +102,7 @@ Bad format (lines 2 and 6 should not be in vtt):
 9:''
 length:10
 */
-function removeVttCounter(lines: string[]): string[] {
+function removeVttCounters(lines: string[]): string[] {
     const enum LineType {
         counter,
         stamp,
@@ -136,7 +136,7 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
         action,
     };
 
-    const lines = removeVttCounter(fileContent.split(/\r?\n/));
+    const lines = removeVttCounters(fileContent.split(/\r?\n/));
 
     const newContent = action === ConvertAction.convert
         ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')

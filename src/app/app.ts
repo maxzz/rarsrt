@@ -156,7 +156,7 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
     let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
     process.stdout.write(`   \r`);
 
-    if (!result?.skipped) {
+    if (!result.skipped) {
         rimraf.sync(srt);
         rimraf.sync(mp4);
         fs.renameSync(out, mp4);
