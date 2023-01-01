@@ -100,7 +100,7 @@ function updateAnimation(st: AnimationState) {
         ani[st.animIndex % len],
         ani[(st.animIndex + 1) % len],
         ani[(st.animIndex + 2) % len],
-        ani[(st.animIndex + 3) % len],
+        // ani[(st.animIndex + 3) % len],
 
         // ani[(st.animIndex + 1 + 1) % len],
         // ani[(st.animIndex + 1 + 2) % len],
@@ -192,4 +192,6 @@ export function handleFolders(dirs: string[]) {
 
 //TODO: coursehunter: write content file as ansi file with coding page 1251
 
-//TODO: remove srt and vtt pairs after merge is successful
+//TODO: remove srt and vtt pairs after merge is successful - done
+
+//TODO: check file length < 255 before any operations; not folder by folder
