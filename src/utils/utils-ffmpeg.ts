@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
-import { removeIndent } from '../utils/utils-es6';
-import { notes } from './app-notes';
+import { removeIndent } from './utils-es6';
+import { notes } from '../app/app-notes';
 
 export namespace ffmpegUtils {
 

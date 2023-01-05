@@ -6,7 +6,7 @@ import { fnames } from '../utils/utils-os';
 import { removeIndent } from '../utils/utils-es6';
 import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
-import { ffmpegUtils } from './utils-ffmpeg';
+import { ffmpegUtils } from '../utils/utils-ffmpeg';
 import { newErrorArgs } from '../utils/utils-errors';
 import { ConvertAction, convertVttToSrt } from '../utils/utils-vtt';
 
@@ -89,26 +89,17 @@ function printFilenameLength(targetFolder: string, final: MSPair[]): void {
     });
 }
 
-type AnimationState = { animIndex: number; animations: string[]; };
+class LineAnimation {
+    animIndex = 0;
+    animations = ["✶", "✸", "✹", "✺", "✹", "✷"];
 
-function updateAnimation(st: AnimationState) {
-    const { animations: ani } = st;
-    const len = ani.length;
-    // process.stdout.write(` ${ani[st.animIndex++ % len]}${ani[st.animIndex % len]}${ani[(st.animIndex + 1) % len]}\r`);
-    st.animIndex++;
-    const arr = [
-        ani[st.animIndex % len],
-        ani[(st.animIndex + 1) % len],
-        ani[(st.animIndex + 2) % len],
-        // ani[(st.animIndex + 3) % len],
+    writeStateLine(msg?: string) {
+        process.stdout.write(` ${this.animations[++this.animIndex % this.animations.length]}${msg || ''}\r`);
+    }
 
-        // ani[(st.animIndex + 1 + 1) % len],
-        // ani[(st.animIndex + 1 + 2) % len],
-        // ani[(st.animIndex + 1 + 3) % len],
-        '\r',
-    ];
-    const str = arr.join('');
-    process.stdout.write(str);
+    cleanStateLine() {
+        process.stdout.write(` \r`);
+    }
 }
 
 function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
@@ -143,9 +134,7 @@ function checkVttFormat(fullFname: string) {
     }
 }
 
-function oneFileAction(animationState: AnimationState, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
-    updateAnimation(animationState);
-
+function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
     let mp4 = path.join(targetFolder, `${shortMp4}`);
     let srt = path.join(targetFolder, `${shortSrt}`);
     let out = path.join(targetFolder, `temp-tm-temp.mp4`);
@@ -153,8 +142,9 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
     checkMaxLength(targetFolder, srt, final);
     checkVttFormat(srt);
 
+    lineAnimation.writeStateLine(shortMp4);
     let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
-    process.stdout.write(`   \r`);
+    lineAnimation.cleanStateLine();
 
     if (!result.skipped) {
         rimraf.sync(mp4);
@@ -165,16 +155,13 @@ function oneFileAction(animationState: AnimationState, targetFolder: string, sho
 
 function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
-    const animationState: AnimationState = {
-        animIndex: 0,
-        animations: [".", "o", "O", "o"], // TODO: write item of # items and current item name
-    };
+    const lineAnimation = new LineAnimation();
 
     let lastFolder = path.basename(targetFolder) || targetFolder;
 
     let final: MSPair[] = getMSPairs(targetFolder);
 
-    final.forEach(({ mp4, srt }) => oneFileAction(animationState, targetFolder, mp4, srt, final));
+    final.forEach(({ mp4, srt }) => oneFileAction(lineAnimation, targetFolder, mp4, srt, final));
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }

@@ -5,7 +5,7 @@ import { Targets } from './app/app-types';
 import { getTargets } from './app/app-arguments';
 import { help } from './app/app-help';
 import { notes } from './app/app-notes';
-import { ffmpegUtils } from './app/utils-ffmpeg';
+import { ffmpegUtils } from './utils/utils-ffmpeg';
 import { handleFiles, handleFolders } from './app/app';
 
 async function main() {
