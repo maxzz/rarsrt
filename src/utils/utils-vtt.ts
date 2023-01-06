@@ -137,16 +137,14 @@ function removeVttCounters(lines: string[], context: Context): string[] {
     */
     const types: LineMeaning[] = getLinesMeaning(lines);
 
-    const newLines = types
-        .map((type, idx) => {
-            const isCounter = type.type === LineType.counter
-                && types[idx + 1].type === LineType.stamp;
-            isCounter && (context.hasFixes = true);
-            return isCounter ? undefined : type;
-        })
-        .filter(Boolean)
-        .map((type) => type.line);
+    function transformLine(type: LineMeaning, idx: number): LineMeaning | undefined {
+        const isCounter = type.type === LineType.counter
+            && types[idx + 1].type === LineType.stamp;
+        isCounter && (context.hasFixes = true);
+        return isCounter ? undefined : type;
+    }
 
+    const newLines = types.map(transformLine).filter(Boolean).map((type) => type.line);
     return newLines;
 }
 
@@ -176,24 +174,22 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
     */
     const types: LineMeaning[] = getLinesMeaning(lines);
 
-    const newLines = types
-        .map((type, idx) => {
-            const isDoubleCounter =
-                type.type === LineType.counter &&
-                (
-                    types[idx + 1].type === LineType.counter &&
-                    types[idx + 2].type === LineType.stamp
-                ) || (
-                    types[idx + 1].type === LineType.empty &&
-                    types[idx + 2].type === LineType.counter &&
-                    types[idx + 3].type === LineType.stamp
-                );
-            isDoubleCounter && (context.hasFixes = true);
-            return isDoubleCounter ? undefined : type;
-        })
-        .filter(Boolean)
-        .map((type) => type.line);
+    function transformLine(type: LineMeaning, idx: number): LineMeaning | undefined {
+        const isDoubleCounter =
+            type.type === LineType.counter &&
+            (
+                types[idx + 1].type === LineType.counter &&
+                types[idx + 2].type === LineType.stamp
+            ) || (
+                types[idx + 1].type === LineType.empty &&
+                types[idx + 2].type === LineType.counter &&
+                types[idx + 3].type === LineType.stamp
+            );
+        isDoubleCounter && (context.hasFixes = true);
+        return isDoubleCounter ? undefined : type;
+    }
 
+    const newLines = types.map(transformLine).filter(Boolean).map((type) => type.line);
     return newLines;
 }
 
