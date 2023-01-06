@@ -1,7 +1,7 @@
 import path from 'path';
 import { exist } from '../utils/utils-os';
 import { newErrorArgs } from '../utils/utils-errors';
-import { AppArgs, AppOptions, Targets } from './app-types';
+import { AppOptions, Targets } from './app-types';
 import { OsStuff } from '../utils/utils-os-stuff';
 
 function checkArg(argTargets: string[]): Targets {
@@ -32,15 +32,20 @@ export function getTargets(): Targets {
     // await exitProcess(0, '');
 
     const args = require('minimist')(process.argv.slice(2), {
-        boolean: ['preserve'],
+        boolean: ['preserve', 'keeporg'],
         default: {
             preserve: false,
+            keeporg: false,
         }
     });
 
     appOptions = {
         preserve: args.preserve,
+        keepOrg: args.keeporg,
     };
+    if (!appOptions.preserve) {
+        appOptions.keepOrg = false;
+    }
  
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');

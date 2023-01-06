@@ -9,6 +9,7 @@ import { newErrorArgs } from '../utils/utils-errors';
 import { ConvertAction, convertVttToSrt, fixSrt } from '../utils/utils-vtt';
 import { LineAnimation, msgFnameTooLong, printFilenameLength } from './app-messages';
 import { getAppOptions } from './app-arguments';
+import { AppOptions } from './app-types';
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
@@ -76,19 +77,19 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     }
 }
 
-function checkVttFormat(fullFname: string) {
+function checkVttFormat(fullFname: string, options: AppOptions) {
     const isVtt = path.extname(fullFname).toLowerCase();
     if (isVtt === '.vtt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
-        if (newCnt.hasFixes) {
+        if (newCnt.hasFixes && !options.keepOrg) {
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
     else if (isVtt === '.srt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = fixSrt(cnt);
-        if (newCnt.hasFixes) {
+        if (newCnt.hasFixes && !options.keepOrg) {
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
@@ -99,8 +100,9 @@ function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, short
     let srt = path.join(targetFolder, `${shortSrt}`);
     let out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
+    const options = getAppOptions();
     checkMaxLength(targetFolder, srt, final);
-    checkVttFormat(srt);
+    checkVttFormat(srt, options);
 
     lineAnimation.writeStateLine(shortMp4);
     let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
@@ -109,7 +111,7 @@ function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, short
     if (!result.skipped) {
         rimraf.sync(mp4);
         fs.renameSync(out, mp4);
-        !getAppOptions().preserve && rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
+        !options.preserve && rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
     }
 }
 

@@ -5,9 +5,5 @@ export type Targets = {
 
 export type AppOptions = {
     preserve: boolean;  // keep subtitle files after successful merge.
-}
-
-export type AppArgs = {
-    targets: Targets;
-    options: AppOptions;
+    keepOrg: boolean;   // corrupted subtitle files will not be fixed if preserve option is set to true.
 }

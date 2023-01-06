@@ -33,6 +33,7 @@
                 
                 "C:/Users/maxzz/Desktop/New folder",
                 "--preserve",
+                "--keeporg",
             ],
             // "args": [
             //     "C:/Users/maxzz/Desktop/111/Docker for Developers, Dockerize React, Node, Mongo - 2021/15 Final Project - Perks nice to have that will make our life so much easier",

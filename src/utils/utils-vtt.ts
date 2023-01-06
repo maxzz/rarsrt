@@ -34,9 +34,12 @@ type LineMeaning = {
     line: string;
 };
 
-function getLineMeaning(line: string): LineMeaning {
-    const type = line.match(regCcCounter) ? LineType.counter : line.match(reg2ItemsLine) || line.match(reg3ItemsLine) ? LineType.stamp : LineType.text;
-    return { type, line };
+function getLinesMeaning(lines: string[]): LineMeaning[] {
+    function getLineMeaning(line: string): LineMeaning {
+        const type = line.match(regCcCounter) ? LineType.counter : line.match(reg2ItemsLine) || line.match(reg3ItemsLine) ? LineType.stamp : LineType.text;
+        return { type, line };
+    }
+    return lines.map(getLineMeaning);
 }
 
 // convert utilities
@@ -123,7 +126,7 @@ Bad format (lines 2 and 6 should not be in vtt):
 length:10
 */
 function removeVttCounters(lines: string[], context: Context): string[] {
-    const types: LineMeaning[] = lines.map(getLineMeaning);
+    const types: LineMeaning[] = getLinesMeaning(lines);
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter
             && idx + 1 < types.length
@@ -168,7 +171,7 @@ Bad format (lines 0 and 4 should not be in srt):
 7:'go before nouns and show the relationship between the noun and the rest of the sentence. There are'
 */
 function removeSrtCounters(lines: string[], context: Context): string[] {
-    const types: LineMeaning[] = lines.map(getLineMeaning);
+    const types: LineMeaning[] = getLinesMeaning(lines);
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter
             && idx + 1 < types.length

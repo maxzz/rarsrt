@@ -13,7 +13,11 @@ Usage: ${APP_NAME} <file(s).mp4> | <folder(s)> [options]
 options
 
   --preserve    don't delete subtitle files after successful 
-                merge (default = false).`;
+                merge (default = false).
+  --keeporg     corrupted subtitle files will not be fixed
+                if preserve option is set to true. This option is
+                ignored if the preserve option is set to false
+                (default = false).`;
 
     console.log(txt);
 }
