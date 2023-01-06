@@ -147,3 +147,5 @@ export function handleFolders(dirs: string[]) {
 //TODO: remove srt and vtt pairs after merge is successful - done
 
 //TODO: check file length < 255 before any operations; not folder by folder
+
+//TODO: remove/subtract (to file) subtitles

@@ -137,7 +137,7 @@ function removeVttCounters(lines: string[], context: Context): string[] {
     */
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
         const isCounter = type.type === LineType.counter
-            && arr[idx + 1].type === LineType.stamp;
+            && arr[idx + 1]?.type === LineType.stamp;
         isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }
@@ -173,17 +173,17 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         const isDoubleCounter =
             type.type === LineType.counter &&
             (
-                arr[idx + 1].type === LineType.counter &&
-                arr[idx + 2].type === LineType.stamp
+                arr[idx + 1]?.type === LineType.counter &&
+                arr[idx + 2]?.type === LineType.stamp
             ) || (
-                arr[idx + 1].type === LineType.empty &&
-                arr[idx + 2].type === LineType.counter &&
-                arr[idx + 3].type === LineType.stamp
+                arr[idx + 1]?.type === LineType.empty &&
+                arr[idx + 2]?.type === LineType.counter &&
+                arr[idx + 3]?.type === LineType.stamp
             );
         isDoubleCounter && (context.hasFixes = true);
         return isDoubleCounter ? undefined : type;
     }
-    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.line);
+    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line);
     return newLines;
 }
 
