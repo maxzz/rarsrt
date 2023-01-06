@@ -14,10 +14,8 @@ options
 
   --preserve    don't delete subtitle files after successful 
                 merge (default = false).
-  --keeporg     corrupted subtitle files will not be fixed
-                if preserve option is set to true. This option is
-                ignored if the preserve option is set to false
-                (default = false).`;
+  --keeporg     back up the original subtitle files before
+                changing them (default = false).`;
 
     console.log(txt);
 }

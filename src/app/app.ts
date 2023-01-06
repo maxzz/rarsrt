@@ -80,18 +80,18 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
 function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
     const ext = path.extname(fullFname).toLowerCase();
     if (ext === '.vtt') {
-        createBackup(fullFname);
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
         if (newCnt.hasFixes) {
+            createBackup(fullFname);
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
     else if (ext === '.srt') {
-        createBackup(fullFname);
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = fixSrt(cnt);
         if (newCnt.hasFixes) {
+            createBackup(fullFname);
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
@@ -99,7 +99,7 @@ function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
     function createBackup(fname: string) {
         if (options.keepOrg) {
             const backupName = replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
-            if (!exist(fname)) {
+            if (!exist(backupName)) {
                 const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
                 fs.writeFileSync(backupName, cnt);
             }
