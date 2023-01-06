@@ -6,7 +6,7 @@ import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
 import { ffmpegUtils } from '../utils/utils-ffmpeg';
 import { newErrorArgs } from '../utils/utils-errors';
-import { ConvertAction, convertVttToSrt } from '../utils/utils-vtt';
+import { ConvertAction, convertVttToSrt, fixSrt } from '../utils/utils-vtt';
 import { LineAnimation, msgFnameTooLong, printFilenameLength } from './app-messages';
 import { getAppOptions } from './app-arguments';
 
@@ -77,16 +77,20 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
 }
 
 function checkVttFormat(fullFname: string) {
-    const isVtt = path.extname(fullFname).toLowerCase() === '.vtt';
-    if (!isVtt) {
-        return;
+    const isVtt = path.extname(fullFname).toLowerCase();
+    if (isVtt === '.vtt') {
+        const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+        const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
+        if (newCnt.hasFixes) {
+            fs.writeFileSync(fullFname, newCnt.newContent);
+        }
     }
-
-    const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-    const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
-
-    if (newCnt.hasFixes) {
-        fs.writeFileSync(fullFname, newCnt.newContent);
+    else if (isVtt === '.srt') {
+        const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+        const newCnt = fixSrt(cnt);
+        if (newCnt.hasFixes) {
+            fs.writeFileSync(fullFname, newCnt.newContent);
+        }
     }
 }
 

@@ -21,6 +21,26 @@ const regCcCounter = /^\s*\d{1,5}\s*$/g;
 const reg2ItemsLine = /(\d{2}:\d{2})\.(\d{3}\s+)-->(\s+\d{2}:\d{2})\.(\d{3}\s*)/g;
 const reg3ItemsLine = /(\d{2}:\d{2}:\d{2})\.(\d{3}\s+)-->(\s+\d{2}:\d{2}:\d{2})\.(\d{3}\s*)/g;
 
+// fix counter utilities
+
+const enum LineType {
+    counter,
+    stamp,
+    text, // anything else
+}
+
+type LineMeaning = {
+    type: LineType;
+    line: string;
+};
+
+function getLineMeaning(line: string): LineMeaning {
+    const type = line.match(regCcCounter) ? LineType.counter : line.match(reg2ItemsLine) || line.match(reg3ItemsLine) ? LineType.stamp : LineType.text;
+    return { type, line };
+}
+
+// convert utilities
+
 function convertTimestamp(item: string, context: Context): string {
     (context.action === ConvertAction.convert) && (item = item.replace('.', ',')); // '00:05.130 ' -> '00:05,130 ' || ' 00:10.350' -> ' 00:10,350'
     if (item.split(":").length < 3) {
@@ -103,22 +123,6 @@ Bad format (lines 2 and 6 should not be in vtt):
 length:10
 */
 function removeVttCounters(lines: string[]): string[] {
-    const enum LineType {
-        counter,
-        stamp,
-        text, // anything else
-    }
-
-    type LineMeaning = {
-        type: LineType;
-        line: string;
-    };
-
-    function getLineMeaning(line: string): LineMeaning {
-        const type = line.match(regCcCounter) ? LineType.counter : line.match(reg2ItemsLine) || line.match(reg3ItemsLine) ? LineType.stamp : LineType.text;
-        return { type, line };
-    }
-
     const types: LineMeaning[] = lines.map(getLineMeaning);
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
@@ -141,6 +145,44 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     const newContent = action === ConvertAction.convert
         ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')
         : lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
+
+    return {
+        newContent,
+        hasFixes: context.hasFixes,
+    };
+}
+
+/*
+Bad format (lines 0 and 4 should not be in srt):
+0:'0'
+1:'1'
+2:'00:00:01,280 --> 00:00:08,450'
+3:'Hello and welcome to this section on prepositions. Prepositions are these kind of small words that'
+4:'1'
+5:'2'
+6:'00:00:08,450 --> 00:00:16,640'
+7:'go before nouns and show the relationship between the noun and the rest of the sentence. There are'
+*/
+function removeSrtCounters(lines: string[]): string[] {
+    const types: LineMeaning[] = lines.map(getLineMeaning);
+    const newLines = types.map((type, idx) => {
+        const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
+        return isCounter ? undefined : type;
+    }).filter(Boolean).map((type) => type.line);
+    
+    return newLines;
+}
+
+export function fixSrt(fileContent: string): ConvertResult {
+    const context: Context = {
+        ccCount: 0,
+        hasFixes: false,
+        action: ConvertAction.fix,
+    };
+
+    const lines = removeSrtCounters(fileContent.split(/\r?\n/));
+
+    const newContent = lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
 
     return {
         newContent,
