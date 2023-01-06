@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import rimraf from 'rimraf';
-import { fnames } from '../utils/utils-os';
+import { exist, fnames, replaceExt } from '../utils/utils-os';
 import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
 import { ffmpegUtils } from '../utils/utils-ffmpeg';
@@ -78,22 +78,31 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
 }
 
 function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
-    if (options.keepOrg) {
-        return;
-    }
-    const isVtt = path.extname(fullFname).toLowerCase();
-    if (isVtt === '.vtt') {
+    const ext = path.extname(fullFname).toLowerCase();
+    if (ext === '.vtt') {
+        createBackup(fullFname);
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
         if (newCnt.hasFixes) {
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
-    else if (isVtt === '.srt') {
+    else if (ext === '.srt') {
+        createBackup(fullFname);
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = fixSrt(cnt);
         if (newCnt.hasFixes) {
             fs.writeFileSync(fullFname, newCnt.newContent);
+        }
+    }
+
+    function createBackup(fname: string) {
+        if (options.keepOrg) {
+            const backupName = replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
+            if (!exist(fname)) {
+                const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+                fs.writeFileSync(backupName, cnt);
+            }
         }
     }
 }
