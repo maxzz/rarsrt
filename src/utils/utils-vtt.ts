@@ -173,10 +173,10 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         const isDoubleCounter =
             type.type === LineType.counter && (
                 (
-                    arr[idx + 1]?.type === LineType.counter &&
+                    arr[idx + 1]?.type === LineType.counter &&  // counter,counter,stamp
                     arr[idx + 2]?.type === LineType.stamp
                 ) || (
-                    arr[idx + 1]?.type === LineType.empty &&
+                    arr[idx + 1]?.type === LineType.empty &&     // counter,empty,counter,stamp
                     arr[idx + 2]?.type === LineType.counter &&
                     arr[idx + 3]?.type === LineType.stamp
                 )
