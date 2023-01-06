@@ -43,9 +43,6 @@ export function getTargets(): Targets {
         preserve: args.preserve,
         keepOrg: args.keeporg,
     };
-    if (!appOptions.preserve) {
-        appOptions.keepOrg = false;
-    }
  
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
