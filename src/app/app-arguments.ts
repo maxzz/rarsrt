@@ -1,7 +1,7 @@
 import path from 'path';
 import { exist } from '../utils/utils-os';
 import { newErrorArgs } from '../utils/utils-errors';
-import { AppArgs, Targets } from './app-types';
+import { AppArgs, AppOptions, Targets } from './app-types';
 import { OsStuff } from '../utils/utils-os-stuff';
 
 function checkArg(argTargets: string[]): Targets {
@@ -27,7 +27,7 @@ function checkArg(argTargets: string[]): Targets {
     return rv;
 }
 
-export function getArguments(): AppArgs {
+export function getTargets(): Targets {
     // console.log('args', JSON.stringify(process.argv.slice(2), null, 4));
     // await exitProcess(0, '');
 
@@ -38,6 +38,10 @@ export function getArguments(): AppArgs {
         }
     });
 
+    appOptions = {
+        preserve: args.preserve,
+    };
+ 
     //console.log(`args ${JSON.stringify(args, null, 4)}`);
     //await exitProcess(0, '');
 
@@ -52,10 +56,11 @@ export function getArguments(): AppArgs {
     // console.log(`targets ${JSON.stringify(targets, null, 4)}`);
     // await exitProcess(0, '');
 
-    return {
-        targets,
-        options: {
-            preserve: args.preserve,
-        },
-    };
+    return targets;
+}
+
+let appOptions = {} as AppOptions;
+
+export function getAppOptions(): AppOptions {
+    return appOptions;
 }

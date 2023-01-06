@@ -8,6 +8,7 @@ import { ffmpegUtils } from '../utils/utils-ffmpeg';
 import { newErrorArgs } from '../utils/utils-errors';
 import { ConvertAction, convertVttToSrt } from '../utils/utils-vtt';
 import { LineAnimation, msgFnameTooLong, printFilenameLength } from './app-messages';
+import { getAppOptions } from './app-arguments';
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
@@ -104,7 +105,7 @@ function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, short
     if (!result.skipped) {
         rimraf.sync(mp4);
         fs.renameSync(out, mp4);
-        rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
+        !getAppOptions().preserve && rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
     }
 }
 
