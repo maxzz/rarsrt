@@ -183,7 +183,7 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         isDoubleCounter && (context.hasFixes = true);
         return isDoubleCounter ? undefined : type;
     }
-    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line);
+    const newLines = getLinesMeaning(lines).map(transformLine).filter((type) => type !== undefined).map((type) => type.line);
     return newLines;
 }
 
