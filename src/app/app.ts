@@ -109,7 +109,6 @@ function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, short
 
     lineAnimation.writeStateLine(shortMp4);
     const result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
-    //lineAnimation.cleanStateLine();
 
     if (!result.skipped) {
         rimraf.sync(mp4);
@@ -127,6 +126,7 @@ function handleFolder(targetFolder: string) {
     let final: MSPair[] = getMSPairs(targetFolder);
 
     final.forEach(({ mp4, srt }) => oneFileAction(lineAnimation, targetFolder, mp4, srt, final));
+    lineAnimation.cleanStateLine();
 
     notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
