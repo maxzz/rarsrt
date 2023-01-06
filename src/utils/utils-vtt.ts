@@ -136,10 +136,10 @@ length:10
 */
 function removeVttCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = getLinesMeaning(lines);
+
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter
             && types[idx + 1].type === LineType.stamp;
-
         isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
@@ -148,7 +148,6 @@ function removeVttCounters(lines: string[], context: Context): string[] {
 }
 
 export function convertVttToSrt(fileContent: string, action: ConvertAction): ConvertResult {
-
     const context: Context = {
         ccCount: 0,
         hasFixes: false,
@@ -156,7 +155,6 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     };
 
     const lines = removeVttCounters(fileContent.split(/\r?\n/), context);
-
     const newContent = action === ConvertAction.convert
         ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')
         : lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
@@ -192,23 +190,20 @@ Bad format (between line 4 and 6 is empty line):
 */
 function removeSrtCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = getLinesMeaning(lines);
-    const newLines = types.map((type, idx) => {
-        // const isCounter = type.type === LineType.counter
-        //     && types[idx + 1].type === LineType.counter
-        //     && types[idx + 2].type === LineType.stamp;
-        const isCounter = (
-            type.type === LineType.counter
-            && types[idx + 1].type === LineType.counter
-            && types[idx + 2].type === LineType.stamp
-        ) || (
-            type.type === LineType.counter
-            && types[idx + 1].type === LineType.empty
-            && types[idx + 2].type === LineType.counter
-            && types[idx + 3].type === LineType.stamp
-        );
 
-        isCounter && (context.hasFixes = true);
-        return isCounter ? undefined : type;
+    const newLines = types.map((type, idx) => {
+        const isDoubleCounter =
+            type.type === LineType.counter &&
+            (
+                types[idx + 1].type === LineType.counter &&
+                types[idx + 2].type === LineType.stamp
+            ) || (
+                types[idx + 1].type === LineType.empty &&
+                types[idx + 2].type === LineType.counter &&
+                types[idx + 3].type === LineType.stamp
+            );
+        isDoubleCounter && (context.hasFixes = true);
+        return isDoubleCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
 
     return newLines;
@@ -222,7 +217,6 @@ export function fixSrt(fileContent: string): ConvertResult {
     };
 
     const lines = removeSrtCounters(fileContent.split(/\r?\n/), context);
-
     const newContent = lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
 
     return {
