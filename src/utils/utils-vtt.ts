@@ -122,10 +122,11 @@ Bad format (lines 2 and 6 should not be in vtt):
 9:''
 length:10
 */
-function removeVttCounters(lines: string[]): string[] {
+function removeVttCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = lines.map(getLineMeaning);
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
+        isCounter && (context.hasFixes = true)
         return isCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
     
@@ -140,7 +141,7 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
         action,
     };
 
-    const lines = removeVttCounters(fileContent.split(/\r?\n/));
+    const lines = removeVttCounters(fileContent.split(/\r?\n/), context);
 
     const newContent = action === ConvertAction.convert
         ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')
@@ -163,10 +164,11 @@ Bad format (lines 0 and 4 should not be in srt):
 6:'00:00:08,450 --> 00:00:16,640'
 7:'go before nouns and show the relationship between the noun and the rest of the sentence. There are'
 */
-function removeSrtCounters(lines: string[]): string[] {
+function removeSrtCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = lines.map(getLineMeaning);
     const newLines = types.map((type, idx) => {
         const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
+        isCounter && (context.hasFixes = true)
         return isCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
     
@@ -180,7 +182,7 @@ export function fixSrt(fileContent: string): ConvertResult {
         action: ConvertAction.fix,
     };
 
-    const lines = removeSrtCounters(fileContent.split(/\r?\n/));
+    const lines = removeSrtCounters(fileContent.split(/\r?\n/), context);
 
     const newContent = lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
 
