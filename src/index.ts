@@ -1,8 +1,8 @@
 import path from 'path';
 import chalk from 'chalk';
 import { exitProcess, newErrorArgs } from './utils/utils-errors';
-import { Targets } from './app/app-types';
-import { getTargets } from './app/app-arguments';
+import { AppArgs, Targets } from './app/app-types';
+import { getArguments } from './app/app-arguments';
 import { help } from './app/app-help';
 import { notes } from './app/app-notes';
 import { ffmpegUtils } from './utils/utils-ffmpeg';
@@ -11,7 +11,8 @@ import { handleFiles, handleFolders } from './app/app';
 async function main() {
     ffmpegUtils.findFFMpeg();
 
-    const targets: Targets = getTargets();
+    const appArgs: AppArgs = getArguments();
+    const targets: Targets = appArgs.targets;
 
     if (targets.files.length) {
         handleFiles([...targets.files, ...targets.dirs]);
