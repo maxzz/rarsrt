@@ -141,7 +141,7 @@ function removeVttCounters(lines: string[], context: Context): string[] {
         isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }
-    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.line);
+    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.line); // use Boolean here to skip empty lines
     return newLines;
 }
 
@@ -171,20 +171,29 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
     */
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
         const isDoubleCounter =
-            type.type === LineType.counter &&
-            (
-                arr[idx + 1]?.type === LineType.counter &&
-                arr[idx + 2]?.type === LineType.stamp
-            ) || (
-                arr[idx + 1]?.type === LineType.empty &&
-                arr[idx + 2]?.type === LineType.counter &&
-                arr[idx + 3]?.type === LineType.stamp
+            type.type === LineType.counter && (
+                (
+                    arr[idx + 1]?.type === LineType.counter &&
+                    arr[idx + 2]?.type === LineType.stamp
+                ) || (
+                    arr[idx + 1]?.type === LineType.empty &&
+                    arr[idx + 2]?.type === LineType.counter &&
+                    arr[idx + 3]?.type === LineType.stamp
+                )
             );
         isDoubleCounter && (context.hasFixes = true);
         return isDoubleCounter ? undefined : type;
     }
+    //const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line); //double lines before counter
+
     const newLines = getLinesMeaning(lines).map(transformLine).filter((type) => type !== undefined).map((type) => type.line);
     return newLines;
+
+    // const newLines = getLinesMeaning(lines);
+    // const a = newLines.map(transformLine);
+    // const b = a.filter((type) => type !== undefined);
+    // const c = b.map((type) => type.line);
+    // return c;
 }
 
 export function convertVttToSrt(fileContent: string, action: ConvertAction): ConvertResult {

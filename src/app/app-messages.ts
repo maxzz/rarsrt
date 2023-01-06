@@ -41,10 +41,10 @@ export class LineAnimation {
     animations = [".  ", ".. ", "...", " ..", "  .", "   ",];
 
     writeStateLine(msg?: string) {
-        process.stdout.write(` ${this.animations[++this.animIndex % this.animations.length]}${msg || ''}\r`);
+        process.stdout.write(` ${this.animations[++this.animIndex % this.animations.length]}${msg || ''} \r`);
     }
 
     cleanStateLine() {
-        process.stdout.write(`   \r`);
+        process.stdout.write(`     \r`);
     }
 }
