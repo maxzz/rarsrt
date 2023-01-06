@@ -1,14 +1,13 @@
 import path from 'path';
 import fs from 'fs';
-import chalk from 'chalk';
 import rimraf from 'rimraf';
 import { fnames } from '../utils/utils-os';
-import { removeIndent } from '../utils/utils-es6';
 import { OsStuff } from '../utils/utils-os-stuff';
 import { notes } from './app-notes';
 import { ffmpegUtils } from '../utils/utils-ffmpeg';
 import { newErrorArgs } from '../utils/utils-errors';
 import { ConvertAction, convertVttToSrt } from '../utils/utils-vtt';
+import { LineAnimation, msgFnameTooLong, printFilenameLength } from './app-messages';
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).
@@ -31,9 +30,9 @@ export function handleFiles(filesToRar: string[]): void {
     */
 }
 
-type MSPair = {     // mp4 and srt pair
-    mp4?: string;   // short filename.mp4
-    srt?: string;   // short filename[(_en| English)](.srt|.vtt)
+export type MSPair = {  // mp4 and srt pair
+    mp4?: string;       // short filename.mp4
+    srt?: string;       // short filename[(_en| English)](.srt|.vtt)
 };
 
 function getMSPairs(targetFolder: string): MSPair[] {
@@ -65,43 +64,6 @@ function getMSPairs(targetFolder: string): MSPair[] {
     return (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
 }
 
-function printFilenameLength(targetFolder: string, final: MSPair[]): void {
-    let oneLong = final.filter((pair) => targetFolder.length + pair.srt.length > 248).length === 1;
-
-    let ss = removeIndent(`
-        ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is' : 'are'} too long.`)}
-        The maximum file name length must not exceed 248 characters.
-        The folder name is ${chalk.gray(`${targetFolder.length}`)} characters long, so ${chalk.gray(`${248 - targetFolder.length}`)} characters remain for the longest name in that folder.
-        
-        ${chalk.yellow('Folder:')}
-        ${targetFolder}
-        
-        ${chalk.yellow('The lengths of the filenames in the folder:')}
-            length | name
-            -------|------------------`);
-    console.log(ss);
-
-    final.forEach((pair) => {
-        let s = path.join(targetFolder, `${pair.srt}`);
-        let isLong = s.length > 248;
-        let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
-        console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srt}`);
-    });
-}
-
-class LineAnimation {
-    animIndex = 0;
-    animations = ["✶", "✸", "✹", "✺", "✹", "✷"];
-
-    writeStateLine(msg?: string) {
-        process.stdout.write(` ${this.animations[++this.animIndex % this.animations.length]}${msg || ''}\r`);
-    }
-
-    cleanStateLine() {
-        process.stdout.write(` \r`);
-    }
-}
-
 function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {
         process.stdout.write(`   \r`);
@@ -109,14 +71,7 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
         notes.flushProcessed();
         printFilenameLength(targetFolder, final);
 
-        let ss = removeIndent(`
-            The filename is too long (${srt.length} characters):
-            ${chalk.gray(srt)}
-            
-            ${chalk.yellow(`Rename the file so that the file name is ${srt.length - 248} character${srt.length - 255 === 1 ? '' : 's'} shorter.`)}`
-        ).replace(/^\r?\n/, '');
-
-        throw Error(ss);
+        throw Error(msgFnameTooLong(srt));
     }
 }
 
