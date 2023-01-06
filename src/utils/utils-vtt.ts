@@ -18,8 +18,8 @@ type Context = {
 
 const regFirstLine = new RegExp(`(WEBVTT\s*(FILE)?.*)(${EOL})*`, 'g');
 const regCcCounter = /^\s*\d{1,5}\s*$/g;
-const reg2ItemsLine = /(\d{2}:\d{2})\.(\d{3}\s+)-->(\s+\d{2}:\d{2})\.(\d{3}\s*)/g;
-const reg3ItemsLine = /(\d{2}:\d{2}:\d{2})\.(\d{3}\s+)-->(\s+\d{2}:\d{2}:\d{2})\.(\d{3}\s*)/g;
+const reg2ItemsLine = /(\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2})[\.,](\d{3}\s*)/g;
+const reg3ItemsLine = /(\d{2}:\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2}:\d{2})[\.,](\d{3}\s*)/g;
 
 // fix counter utilities
 
@@ -125,11 +125,14 @@ length:10
 function removeVttCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = lines.map(getLineMeaning);
     const newLines = types.map((type, idx) => {
-        const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
-        isCounter && (context.hasFixes = true)
+        const isCounter = type.type === LineType.counter
+            && idx + 1 < types.length
+            && types[idx + 1].type === LineType.stamp;
+
+        isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
-    
+
     return newLines;
 }
 
@@ -167,11 +170,16 @@ Bad format (lines 0 and 4 should not be in srt):
 function removeSrtCounters(lines: string[], context: Context): string[] {
     const types: LineMeaning[] = lines.map(getLineMeaning);
     const newLines = types.map((type, idx) => {
-        const isCounter = type.type === LineType.counter && idx + 1 < types.length && types[idx + 1].type === LineType.stamp;
-        isCounter && (context.hasFixes = true)
+        const isCounter = type.type === LineType.counter
+            && idx + 1 < types.length
+            && types[idx + 1].type === LineType.counter
+            && idx + 2 < types.length
+            && types[idx + 2].type === LineType.stamp;
+
+        isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }).filter(Boolean).map((type) => type.line);
-    
+
     return newLines;
 }
 
