@@ -77,36 +77,39 @@ function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     }
 }
 
-function checkVttFormat(fullFname: string, options: AppOptions) {
+function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
+    if (options.keepOrg) {
+        return;
+    }
     const isVtt = path.extname(fullFname).toLowerCase();
     if (isVtt === '.vtt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = convertVttToSrt(cnt, ConvertAction.fix);
-        if (newCnt.hasFixes && !options.keepOrg) {
+        if (newCnt.hasFixes) {
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
     else if (isVtt === '.srt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt = fixSrt(cnt);
-        if (newCnt.hasFixes && !options.keepOrg) {
+        if (newCnt.hasFixes) {
             fs.writeFileSync(fullFname, newCnt.newContent);
         }
     }
 }
 
 function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
-    let mp4 = path.join(targetFolder, `${shortMp4}`);
-    let srt = path.join(targetFolder, `${shortSrt}`);
-    let out = path.join(targetFolder, `temp-tm-temp.mp4`);
+    const mp4 = path.join(targetFolder, `${shortMp4}`);
+    const srt = path.join(targetFolder, `${shortSrt}`);
+    const out = path.join(targetFolder, `temp-tm-temp.mp4`);
 
     const options = getAppOptions();
     checkMaxLength(targetFolder, srt, final);
-    checkVttFormat(srt, options);
+    checkSubtitlesFormat(srt, options);
 
     lineAnimation.writeStateLine(shortMp4);
-    let result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
-    lineAnimation.cleanStateLine();
+    const result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
+    //lineAnimation.cleanStateLine();
 
     if (!result.skipped) {
         rimraf.sync(mp4);
