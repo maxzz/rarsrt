@@ -7,37 +7,40 @@ import { LineAnimation } from './app-messages';
 import { getAppOptions } from './app-arguments';
 import { checkMaxLength, checkSubtitlesFormat, getMSPairs, MSPair } from './process';
 
-function oneFileAction(lineAnimation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
-    const mp4 = path.join(targetFolder, `${shortMp4}`);
-    const srt = path.join(targetFolder, `${shortSrt}`);
-    const out = path.join(targetFolder, `temp-tm-temp.mp4`);
+function oneFileAction(animation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
+    const mp4FullFname = path.join(targetFolder, shortMp4);
+    const srtFullFname = path.join(targetFolder, shortSrt);
+    const outFullFname = path.join(targetFolder, `temp-tm-temp.mp4`);
 
-    const options = getAppOptions();
-    checkMaxLength(targetFolder, srt, final);
-    checkSubtitlesFormat(srt, options);
+    const appOptions = getAppOptions();
 
-    lineAnimation.writeStateLine(shortMp4);
-    const result = ffmpegUtils.createFileMp4WithSrt(mp4, srt, out); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
+    checkMaxLength(targetFolder, srtFullFname, final);
+    checkSubtitlesFormat(srtFullFname, appOptions);
+
+    animation.writeStateLine(shortMp4);
+    
+    const result = ffmpegUtils.createFileMp4WithSrt(mp4FullFname, srtFullFname, outFullFname); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
 
     if (!result.skipped) {
-        rimraf.sync(mp4);
-        fs.renameSync(out, mp4);
-        !options.preserve && rimraf.sync(srt); // remove it as the last, in case if mp4 is locked by player.
+        rimraf.sync(mp4FullFname);
+        fs.renameSync(outFullFname, mp4FullFname);
+        !appOptions.preserve && rimraf.sync(srtFullFname); // remove it as the last, in case if mp4 is locked by player.
     }
 }
 
 function handleFolder(targetFolder: string) {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
-    const lineAnimation = new LineAnimation();
+    const animation = new LineAnimation();
+    const lastFolder = path.basename(targetFolder) || targetFolder;
+    const allPairs: MSPair[] = getMSPairs(targetFolder);
 
-    let lastFolder = path.basename(targetFolder) || targetFolder;
+    allPairs.forEach(({ mp4, srt }) => {
+        oneFileAction(animation, targetFolder, mp4, srt, allPairs);
+    });
 
-    let final: MSPair[] = getMSPairs(targetFolder);
+    animation.cleanStateLine();
 
-    final.forEach(({ mp4, srt }) => oneFileAction(lineAnimation, targetFolder, mp4, srt, final));
-    lineAnimation.cleanStateLine();
-
-    notes.addProcessed(`    ${final.length ? ` (${final.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
+    notes.addProcessed(`    ${allPairs.length ? ` (${allPairs.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
 
 export function handleFolders(dirs: string[]) {
