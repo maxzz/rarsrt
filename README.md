@@ -45,6 +45,7 @@ There was no danger at all.
 [.SRT SubRip file format specification](http://forum.doom9.org/showthread.php?p=470941#post470941)
 
 ### [VTT file format](https://en.wikipedia.org/wiki/WebVTT) WebVTT
+[WebVTT Standard on GitHub](https://github.com/w3c/webvtt)
 
 ```
 WEBVTT

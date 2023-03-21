@@ -1,14 +1,16 @@
+import chalk from 'chalk';
 import { group } from 'console';
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, printDebugLineMeanings, printLineMeaningsGroups, splitLineMeaningsToGroups } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType, printDebugLineMeanings, printLineMeaningsGroups, processWithGroups, splitLineMeaningsToGroups } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
 
 function removeVttCounters(linesMeaning: LineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
+    const nonEmpty = transformedLines.filter(Boolean);
 
-    const newLines = transformedLines.filter(Boolean).map((type) => type.line); // use Boolean here to skip empty lines
+    const newLines = nonEmpty.map((type) => typeof type.line === 'string' ? type.line : type.line.join(EOL) ); // use Boolean here to skip empty lines
     return newLines;
 
     /*
@@ -36,8 +38,9 @@ function removeVttCounters(linesMeaning: LineMeaning[], context: Context): strin
 
 function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
+    const nonEmpty = transformedLines.filter((type) => type !== undefined);
 
-    const newLines = transformedLines.filter((type) => type !== undefined).map((type) => type.line);
+    const newLines = nonEmpty.map((type) => typeof type.line === 'string' ? type.line : type.line.join(EOL));
     return newLines;
 
     /*
@@ -122,40 +125,12 @@ export function fixSrt(fileContent: string): ConvertResult {
     };
 
     const fileLines = fileContent.split(/\r?\n/);
-    const linesMeaning = getLinesMeaning(fileLines);
 
-    const groups = splitLineMeaningsToGroups(linesMeaning);
+    processWithGroups(fileLines);
 
-    function fixSrtGroup(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeaning] | undefined {
-        // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
-        // 2. remove any empty lines
-
-        type GroupItem = {
-            stamp?: LineMeaning;
-            text?: LineMeaning;
-        };
-
-        const items = group.reduce<GroupItem>((acc, cur) => {
-            (cur.type === LineType.stamp) && (acc.stamp = cur);
-            (cur.type === LineType.text) && (acc.text = cur);
-            return acc;
-        }, {});
-
-        const rv: LineMeaning[] = [];
-
-        //rv.push({ type: LineType.counter, line: `${idx + 1}` });
-
-        if (items.stamp && items.text) {
-            return [items.stamp, items.text];
-        }
-    }
-
-    const fixedGroups = groups.map(fixSrtGroup);
-
-
-    //printLineMeaningsGroups(groups);
-    printLineMeaningsGroups(fixedGroups);
     process.exit(0);
+
+    const linesMeaning = getLinesMeaning(fileLines);
 
     //printDebugLineMeanings(linesMeaning);
 
