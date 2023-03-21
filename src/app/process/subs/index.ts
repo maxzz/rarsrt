@@ -1,3 +1,4 @@
+import { group } from 'console';
 import { EOL } from 'os';
 import { getLinesMeaning, LineMeaning, LineType, printDebugLineMeanings, printLineMeaningsGroups, splitLineMeaningsToGroups } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
@@ -125,15 +126,16 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     const groups = splitLineMeaningsToGroups(linesMeaning);
 
-    function fixSrtGroup(group: LineMeaning[], idx: number): LineMeaning[] {
+    function fixSrtGroup(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeaning] | undefined {
+        // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
+        // 2. remove any empty lines
+
         type GroupItem = {
-            cnt?: LineMeaning;
             stamp?: LineMeaning;
             text?: LineMeaning;
         };
 
         const items = group.reduce<GroupItem>((acc, cur) => {
-            (cur.type === LineType.counter) && (acc.cnt = cur);
             (cur.type === LineType.stamp) && (acc.stamp = cur);
             (cur.type === LineType.text) && (acc.text = cur);
             return acc;
@@ -141,17 +143,11 @@ export function fixSrt(fileContent: string): ConvertResult {
 
         const rv: LineMeaning[] = [];
 
-        rv.push(items.cnt || { type: LineType.counter, line: `${idx + 1}` });
+        //rv.push({ type: LineType.counter, line: `${idx + 1}` });
 
-        if (items.stamp) {
-            rv.push(items.stamp);
+        if (items.stamp && items.text) {
+            return [items.stamp, items.text];
         }
-
-        if (items.text) {
-            rv.push(items.text);
-        }
-
-        return rv;
     }
 
     const fixedGroups = groups.map(fixSrtGroup);
