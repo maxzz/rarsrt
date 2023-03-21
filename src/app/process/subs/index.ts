@@ -125,7 +125,7 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     const groups = splitLineMeaningsToGroups(linesMeaning);
 
-    function fixSrtGroup(group: LineMeaning[]): LineMeaning[] {
+    function fixSrtGroup(group: LineMeaning[], idx: number): LineMeaning[] {
         type GroupItem = {
             cnt?: LineMeaning;
             stamp?: LineMeaning;
@@ -140,10 +140,8 @@ export function fixSrt(fileContent: string): ConvertResult {
         }, {});
 
         const rv: LineMeaning[] = [];
-        
-        if (items.cnt) {
-            rv.push(items.cnt);
-        }
+
+        rv.push(items.cnt || { type: LineType.counter, line: `${idx + 1}` });
 
         if (items.stamp) {
             rv.push(items.stamp);
@@ -156,7 +154,11 @@ export function fixSrt(fileContent: string): ConvertResult {
         return rv;
     }
 
-    printLineMeaningsGroups(groups);
+    const fixedGroups = groups.map(fixSrtGroup);
+
+
+    //printLineMeaningsGroups(groups);
+    printLineMeaningsGroups(fixedGroups);
     process.exit(0);
 
     //printDebugLineMeanings(linesMeaning);
