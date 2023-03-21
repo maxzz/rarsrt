@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { removeIndent } from "../utils/utils-es6";
-import type { MSPair } from "./app";
+import { MSPair } from "./process";
 
 export function printFilenameLength(targetFolder: string, final: MSPair[]): void {
     let oneLong = final.filter((pair) => targetFolder.length + pair.srt.length > 248).length === 1;

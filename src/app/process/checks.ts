@@ -1,10 +1,10 @@
 import fs from 'fs';
 import { exist, replaceExt } from '../../utils/utils-os';
-import { ConvertAction, convertVttToSrt, fixSrt } from "../../utils/utils-vtt";
 import { msgFnameTooLong, printFilenameLength } from "../app-messages";
 import { notes } from "../app-notes";
 import { AppOptions } from "../app-types";
 import { MSPair } from "./matched-pairs";
+import { ConvertAction, convertVttToSrt, fixSrt } from "./subs/utils-vtt";
 
 export function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {
