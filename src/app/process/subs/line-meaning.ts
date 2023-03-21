@@ -67,6 +67,23 @@ export function printLineMeanings(lines: LineMeaning[]) {
 
 export function printLineMeaningsGroups(lines: LineMeaning[][]) {
     lines.forEach((group) => {
+        console.log(chalk.green('start:'));
         printLineMeanings(group);
     });
+}
+
+export function printDebugLineMeanings(linesMeaning: LineMeaning[]) {
+    const doGroups = true;
+    const doAll = false;
+    
+    if (doGroups) {
+        const groups = splitLineMeaningsToGroups(linesMeaning);
+        printLineMeaningsGroups(groups);
+        process.exit(0);
+    }
+
+    if (doAll) {
+        printLineMeanings(linesMeaning);
+        process.exit(0);
+    }
 }

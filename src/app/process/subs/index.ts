@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, printLineMeanings, printLineMeaningsGroups, splitLineMeaningsToGroups } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType, printDebugLineMeanings, printLineMeaningsGroups, splitLineMeaningsToGroups } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
@@ -90,7 +90,8 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
 
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
-    printDebugLines(linesMeaning);
+
+    printDebugLineMeanings(linesMeaning);
 
     const fixedLines = removeVttCounters(linesMeaning, context);
 
@@ -112,15 +113,6 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     };
 }
 
-function printDebugLines(linesMeaning: LineMeaning[]) {
-    //printLineMeanings(linesMeaning);
-
-    const groups = splitLineMeaningsToGroups(linesMeaning)
-    printLineMeaningsGroups(groups);
-    
-    process.exit(0);
-}
-
 export function fixSrt(fileContent: string): ConvertResult {
     const context: Context = {
         ccCount: 0,
@@ -130,8 +122,45 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
-    printDebugLines(linesMeaning);
-    
+
+    const groups = splitLineMeaningsToGroups(linesMeaning);
+
+    function fixSrtGroup(group: LineMeaning[]): LineMeaning[] {
+        type GroupItem = {
+            cnt?: LineMeaning;
+            stamp?: LineMeaning;
+            text?: LineMeaning;
+        };
+
+        const items = group.reduce<GroupItem>((acc, cur) => {
+            (cur.type === LineType.counter) && (acc.cnt = cur);
+            (cur.type === LineType.stamp) && (acc.stamp = cur);
+            (cur.type === LineType.text) && (acc.text = cur);
+            return acc;
+        }, {});
+
+        const rv: LineMeaning[] = [];
+        
+        if (items.cnt) {
+            rv.push(items.cnt);
+        }
+
+        if (items.stamp) {
+            rv.push(items.stamp);
+        }
+
+        if (items.text) {
+            rv.push(items.text);
+        }
+
+        return rv;
+    }
+
+    printLineMeaningsGroups(groups);
+    process.exit(0);
+
+    //printDebugLineMeanings(linesMeaning);
+
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
 
     const newLines = fixedLines.map((line) => fixVttLine(line, context));
