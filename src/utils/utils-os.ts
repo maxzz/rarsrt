@@ -8,6 +8,20 @@ export function exist(name: string): fs.Stats | undefined {
     }
 }
 
+export function returnFileSize(number: number): string {
+    //https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+    //https://github.com/mdn/learning-area/blob/main/html/forms/file-examples/file-example.html
+    if (number < 1024) {
+        return number + 'bytes';
+    } else if (number > 1024 && number < 1048576) { // 1024 < n < 1024 * 1024
+        return (number / 1024).toFixed(1) + 'KB';
+    } else if (number > 1048576 && number < 1073741824) { // 1024 * 1024 < n < 1024 * 1024 * 1024
+        return (number / 1048576).toFixed(1) + 'MB';
+    } else {
+        return (number / 1073741824).toFixed(1) + 'GB';
+    }
+}
+
 export function toUnix(fileName: string): string {
     const double = /\/\//;
     let res: string = fileName.replace(/\\/g, '/');

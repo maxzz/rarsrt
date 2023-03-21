@@ -81,12 +81,6 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         isDoubleCounter && (context.hasFixes = true);
         return isDoubleCounter ? undefined : type;
     }
-
-    // const newLines = getLinesMeaning(lines);
-    // const a = newLines.map(transformLine);
-    // const b = a.filter((type) => type !== undefined);
-    // const c = b.map((type) => type.line);
-    // return c;
 }
 
 export function convertVttToSrt(fileContent: string, action: ConvertAction): ConvertResult {
@@ -99,7 +93,7 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     const fileLines = fileContent.split(/\r?\n/);
     const fixedLines = removeVttCounters(fileLines, context);
 
-    let newContent: string;
+    let newContent: string = fileContent;
 
     if (action === ConvertAction.convert) {
         const newLines = fixedLines.map((line) => convertLine(line, context));

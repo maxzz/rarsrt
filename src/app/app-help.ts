@@ -14,8 +14,8 @@ options
 
   --preserve    don't delete subtitle files after successful 
                 merge (default = false).
-  --keeporg     back up the original subtitle files before
-                changing them (default = false).`;
+  --keeporg     backup the original subtitle files (with ext.: .___)
+                before changing them (default = false).`;
 
     console.log(txt);
 }
