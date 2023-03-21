@@ -36,10 +36,37 @@ export function getLinesMeaning(lines: string[]): LineMeaning[] {
     return lines.map(getLineMeaning);
 }
 
+export function splitLineMeaningsToGroups(lines: LineMeaning[]) {
+    const groups: LineMeaning[][] = [];
+    let current: LineMeaning[] = [];
+
+    lines.forEach((line) => {
+        current.push(line);
+
+        if (line.type === LineType.text) {
+            if (current.length) {
+                groups.push(current);
+            }
+            current = [];
+        }
+    });
+
+    if (current.length) {
+        groups.push(current);
+    }
+
+    return groups;
+}
+
 export function printLineMeanings(lines: LineMeaning[]) {
     lines.forEach(({ line, type }) => {
-        // const s = type === LineType.counter ? chalk.cyan('n🎫') : type === LineType.stamp ? chalk.yellow('s⏱') : type === LineType.empty ? ' ' : type === LineType.text ? chalk.gray('t📃') : chalk.red('?'); //🏀📀♦
         const s = type === LineType.counter ? chalk.cyan('numbr') : type === LineType.stamp ? chalk.yellow('stamp') : type === LineType.empty ? '     ' : type === LineType.text ? chalk.gray(' text') : chalk.red('?');
         console.log(`${s}: ${line}`);
+    });
+}
+
+export function printLineMeaningsGroups(lines: LineMeaning[][]) {
+    lines.forEach((group) => {
+        printLineMeanings(group);
     });
 }

@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, printLineMeanings } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType, printLineMeanings, printLineMeaningsGroups, splitLineMeaningsToGroups } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
@@ -90,7 +90,8 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
 
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
-    printLineMeanings(linesMeaning);
+    printDebugLines(linesMeaning);
+
     const fixedLines = removeVttCounters(linesMeaning, context);
 
     let newContent: string = fileContent;
@@ -111,6 +112,15 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     };
 }
 
+function printDebugLines(linesMeaning: LineMeaning[]) {
+    //printLineMeanings(linesMeaning);
+
+    const groups = splitLineMeaningsToGroups(linesMeaning)
+    printLineMeaningsGroups(groups);
+    
+    process.exit(0);
+}
+
 export function fixSrt(fileContent: string): ConvertResult {
     const context: Context = {
         ccCount: 0,
@@ -120,7 +130,8 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
-    printLineMeanings(linesMeaning);
+    printDebugLines(linesMeaning);
+    
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
 
     const newLines = fixedLines.map((line) => fixVttLine(line, context));
