@@ -49,25 +49,27 @@ function getMSPairs(targetFolder: string): MSPair[] {
     let msPairs: Record<string, MSPair> = {}; // short filename wo/ ext -> { mp4: short filename.mp4, srt: short filename(.srt|.vtt) }
 
     fItems.forEach((item: FItem) => {
-        let base = path.parse(item.short).name;
+        const base = path.parse(item.short).name;
 
         if (item.ext === fnames.ExtType.mp4) {
-            (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
+            const current = (msPairs[base] || (msPairs[base] = {}));
+            current.mp4 = item.short;
         }
-        else if (item.ext === fnames.ExtType.srt) {
-            const clean = base.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name English.srt'; 'name.en.srt'; 'name_en.srt'
-            
-            (msPairs[clean] || (msPairs[clean] = {})).srt = item.short;
+        else if (item.ext === fnames.ExtType.srt || item.ext === fnames.ExtType.vtt) {
+            const clean = cleanUpSubName(base);
+            const current = (msPairs[clean] || (msPairs[clean] = {}));
+            current.srt = item.short;
         }
-        else if (item.ext === fnames.ExtType.vtt) {
-            const clean = base.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
-            
-            (msPairs[clean] || (msPairs[clean] = {})).srt = item.short;
-        }
-
     }); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
-    return (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
+    const completePairs: MSPair[] = (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
+    return completePairs;
+
+    function cleanUpSubName(name: string) {
+        // Cases: 'name English.srt/vtt'; 'name.en.srt/vtt'; 'name_en.srt/vtt' but not 'name French.vtt'
+        const clean = name.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, '');
+        return clean;
+    }
 }
 
 function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
@@ -102,7 +104,7 @@ function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
 
     function createBackup(fname: string) {
         if (options.keepOrg) {
-            const backupName =  replaceExt(fname, '.___'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
+            const backupName = replaceExt(fname, '.___'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
             if (!exist(backupName)) {
                 const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
                 fs.writeFileSync(backupName, cnt);
