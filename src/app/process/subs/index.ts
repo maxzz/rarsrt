@@ -1,11 +1,10 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType, printLineMeanings } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
 
-function removeVttCounters(lines: string[], context: Context): string[] {
-    const linesMeaning = getLinesMeaning(lines);
+function removeVttCounters(linesMeaning: LineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
 
     const newLines = transformedLines.filter(Boolean).map((type) => type.line); // use Boolean here to skip empty lines
@@ -34,8 +33,7 @@ function removeVttCounters(lines: string[], context: Context): string[] {
     }
 }
 
-function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
-    const linesMeaning = getLinesMeaning(lines);
+function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
 
     const newLines = transformedLines.filter((type) => type !== undefined).map((type) => type.line);
@@ -91,7 +89,9 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     };
 
     const fileLines = fileContent.split(/\r?\n/);
-    const fixedLines = removeVttCounters(fileLines, context);
+    const linesMeaning = getLinesMeaning(fileLines);
+    printLineMeanings(linesMeaning);
+    const fixedLines = removeVttCounters(linesMeaning, context);
 
     let newContent: string = fileContent;
 
@@ -119,7 +119,9 @@ export function fixSrt(fileContent: string): ConvertResult {
     };
 
     const fileLines = fileContent.split(/\r?\n/);
-    const fixedLines = removeSrtDoubleCounters(fileLines, context);
+    const linesMeaning = getLinesMeaning(fileLines);
+    printLineMeanings(linesMeaning);
+    const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
 
     const newLines = fixedLines.map((line) => fixVttLine(line, context));
 

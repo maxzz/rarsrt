@@ -42,7 +42,7 @@
             // ],
             // "args": ["tests"],
             // "args": ["."],
-            "console": "externalTerminal"
+            "console": "externalTerminal",
         }
     ]
 }

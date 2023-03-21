@@ -34,3 +34,10 @@ export function getLinesMeaning(lines: string[]): LineMeaning[] {
     }
     return lines.map(getLineMeaning);
 }
+
+export function printLineMeanings(lines: LineMeaning[]) {
+    lines.forEach(({ line, type }) => {
+        const s = type === LineType.counter ? '🎫n' : type === LineType.stamp ? '⏱s' : type === LineType.empty ? ' ' : type === LineType.text ? '📃t' : '🏀?'; //📀♦
+        console.log(`${s}: ${line}`);
+    });
+}
