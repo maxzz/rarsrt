@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { EOL } from 'os';
 
 // fix counter utilities
@@ -37,7 +38,8 @@ export function getLinesMeaning(lines: string[]): LineMeaning[] {
 
 export function printLineMeanings(lines: LineMeaning[]) {
     lines.forEach(({ line, type }) => {
-        const s = type === LineType.counter ? '🎫n' : type === LineType.stamp ? '⏱s' : type === LineType.empty ? ' ' : type === LineType.text ? '📃t' : '🏀?'; //📀♦
+        // const s = type === LineType.counter ? chalk.cyan('n🎫') : type === LineType.stamp ? chalk.yellow('s⏱') : type === LineType.empty ? ' ' : type === LineType.text ? chalk.gray('t📃') : chalk.red('?'); //🏀📀♦
+        const s = type === LineType.counter ? chalk.cyan('numbr') : type === LineType.stamp ? chalk.yellow('stamp') : type === LineType.empty ? '     ' : type === LineType.text ? chalk.gray(' text') : chalk.red('?');
         console.log(`${s}: ${line}`);
     });
 }
