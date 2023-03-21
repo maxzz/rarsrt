@@ -6,7 +6,8 @@ import { getTargets } from './app/app-arguments';
 import { help } from './app/app-help';
 import { notes } from './app/app-notes';
 import { ffmpegUtils } from './utils/utils-ffmpeg';
-import { handleFiles, handleFolders } from './app/app';
+import { handleFolders } from './app/app';
+import { handleFiles } from './app/process';
 
 async function main() {
     ffmpegUtils.findFFMpeg();
@@ -40,3 +41,17 @@ main().catch(async (error) => {
 
 //TODO: add option for encoding .srt files: win1251 -> utf8
 //TODO: handle .avi files like .mp4 as well?
+
+//app.ts
+    //added global node-vtt-to-srt //https://www.npmjs.com/package/node-vtt-to-srt (vtt-to-srt will not work): 'node-vtt-to-srt lesson01.srt < lesson01.vtt'
+
+    //TBD: if folder has N of mp4 and N of str(or vtt) then we can match on first M matching characters (from srt or mp4 filename).
+    //  like 43 - 31564200.mp4 and 43 - E2E Tests English.vtt
+
+    //TODO: coursehunter: write content file as ansi file with coding page 1251
+
+    //TODO: remove srt and vtt pairs after merge is successful - done
+
+    //TODO: check file length < 255 before any operations; not folder by folder
+
+    //TODO: remove/subtract (to file) subtitles
