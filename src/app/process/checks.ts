@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import { exist, replaceExt } from '../../utils/utils-os';
 import { msgFnameTooLong, printFilenameLength } from "../app-messages";
 import { notes } from "../app-notes";
