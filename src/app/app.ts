@@ -50,17 +50,21 @@ function getMSPairs(targetFolder: string): MSPair[] {
 
     fItems.forEach((item: FItem) => {
         let base = path.parse(item.short).name;
+
         if (item.ext === fnames.ExtType.mp4) {
             (msPairs[base] || (msPairs[base] = {})).mp4 = item.short;
         }
         else if (item.ext === fnames.ExtType.srt) {
-            base = base.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name English.srt'; 'name.en.srt'; 'name_en.srt'
-            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
+            const clean = base.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name English.srt'; 'name.en.srt'; 'name_en.srt'
+            
+            (msPairs[clean] || (msPairs[clean] = {})).srt = item.short;
         }
         else if (item.ext === fnames.ExtType.vtt) {
-            base = base.replace(/ English$/i, '').replace(/_en$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
-            (msPairs[base] || (msPairs[base] = {})).srt = item.short;
+            const clean = base.replace(/ English$/i, '').replace(/\.en$/, '').replace(/_en$/i, ''); // handle case: 'name English.vtt'; or it can be 'name French.vtt'
+            
+            (msPairs[clean] || (msPairs[clean] = {})).srt = item.short;
         }
+
     }); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
     return (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
