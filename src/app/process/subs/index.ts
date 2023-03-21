@@ -98,9 +98,19 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
 
     const lines = removeVttCounters(fileContent.split(/\r?\n/), context);
 
-    const newContent = action === ConvertAction.convert
-        ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')
-        : lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
+    let newContent: string;
+
+    if (action === ConvertAction.convert) {
+        const newLines = lines.map((line) => convertLine(line, context));
+        newContent = newLines.filter((line) => line !== undefined).join('');
+    } else if (action === ConvertAction.fix) {
+        const newLines = lines.map((line) => fixVttLine(line, context));
+        newContent = newLines.filter((line) => line !== undefined).join(EOL);
+    }
+
+    // const newContent = action === ConvertAction.convert
+    //     ? lines.map((line) => convertLine(line, context)).filter((line) => line !== undefined).join('')
+    //     : lines.map((line) => fixVttLine(line, context)).filter((line) => line !== undefined).join(EOL);
 
     return {
         newContent,
