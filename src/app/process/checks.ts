@@ -4,7 +4,7 @@ import { msgFnameTooLong, printFilenameLength } from "../app-messages";
 import { notes } from "../app-notes";
 import { AppOptions } from "../app-types";
 import { MSPair } from "./matched-pairs";
-import { ConvertAction, convertVttToSrt, fixSrt } from "./subs/utils-vtt";
+import { ConvertAction, convertVttToSrt, fixSrt } from "./subs";
 
 export function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {
