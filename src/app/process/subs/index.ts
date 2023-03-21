@@ -1,10 +1,16 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, reg2ItemsLine, reg3ItemsLine, regFirstLine } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
 
 function removeVttCounters(lines: string[], context: Context): string[] {
+    const linesMeaning = getLinesMeaning(lines);
+    const transformedLines = linesMeaning.map(transformLine);
+
+    const newLines = transformedLines.filter(Boolean).map((type) => type.line); // use Boolean here to skip empty lines
+    return newLines;
+
     /*
     Bad format (lines 2 and 6 should not be in vtt):
         0:'WEBVTT'
@@ -20,16 +26,21 @@ function removeVttCounters(lines: string[], context: Context): string[] {
         length:10
     */
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
-        const isCounter = type.type === LineType.counter
-            && arr[idx + 1]?.type === LineType.stamp;
+        const isCounter =
+            type.type === LineType.counter && arr[idx + 1]?.type === LineType.stamp;
+
         isCounter && (context.hasFixes = true);
         return isCounter ? undefined : type;
     }
-    const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.line); // use Boolean here to skip empty lines
-    return newLines;
 }
 
 function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
+    const linesMeaning = getLinesMeaning(lines);
+    const transformedLines = linesMeaning.map(transformLine);
+
+    const newLines = transformedLines.filter((type) => type !== undefined).map((type) => type.line);
+    return newLines;
+
     /*
     Bad format (lines 0 and 4 should not be in srt):
         0:'0'
@@ -53,6 +64,8 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         7:{type: 1, line: '00:00:08,450 --> 00:00:16,640'}
         8:{type: 3, line: 'go before nouns and show the relationship betw… noun and the rest of the sentence. There are'}
     */
+    //const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line); //double lines before counter
+
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
         const isDoubleCounter =
             type.type === LineType.counter && (
@@ -68,10 +81,6 @@ function removeSrtDoubleCounters(lines: string[], context: Context): string[] {
         isDoubleCounter && (context.hasFixes = true);
         return isDoubleCounter ? undefined : type;
     }
-    //const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line); //double lines before counter
-
-    const newLines = getLinesMeaning(lines).map(transformLine).filter((type) => type !== undefined).map((type) => type.line);
-    return newLines;
 
     // const newLines = getLinesMeaning(lines);
     // const a = newLines.map(transformLine);
