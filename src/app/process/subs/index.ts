@@ -93,8 +93,6 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
 
-    //printDebugLineMeanings(linesMeaning);
-
     const fixedLines = removeVttCounters(linesMeaning, context);
 
     let newContent: string = fileContent;
@@ -126,12 +124,26 @@ export function fixSrt(fileContent: string): ConvertResult {
     const fileLines = fileContent.split(/\r?\n/);
 
     const newGroups = processWithGroups({ fileLines, doSrt: true });
+
     printLineMeaningsGroups(newGroups);
 
+    const newContent = newGroups.map(
+        (group) => group.map(
+            ({ line }) => typeof line === 'string' ? line : line.join(EOL)
+        ).join(EOL)
+    ).join(EOL);
+
+    return {
+        newContent,
+        hasFixes: true,
+    };
+
+    /*
     process.exit(0);
 
     const linesMeaning = getLinesMeaning(fileLines);
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
+
     const newLines = fixedLines.map((line) => fixVttLine(line, context));
     const newContent = newLines.filter((line) => line !== undefined).join(EOL);
 
@@ -139,4 +151,5 @@ export function fixSrt(fileContent: string): ConvertResult {
         newContent,
         hasFixes: context.hasFixes,
     };
+    */
 }
