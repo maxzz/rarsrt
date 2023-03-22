@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineType, LineMeaning } from './line-meaning';
+import { getLinesMeaning, LineType, LineMeaning, printLineMeaningsGroups } from './line-meaning';
 import { Context, convertVttLine, fixVttLine, processWithGroups } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
@@ -126,7 +126,7 @@ export function fixSrt(fileContent: string): ConvertResult {
     const fileLines = fileContent.split(/\r?\n/);
 
     const newGroups = processWithGroups({ fileLines, doSrt: true });
-    //printLineMeaningsGroups(newGroups);
+    printLineMeaningsGroups(newGroups);
 
     process.exit(0);
 

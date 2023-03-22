@@ -13,12 +13,12 @@ export type Context = {
 
 function convertTimestamp(timestampStr: string, context: Context): string {
     if (context.action === ConvertAction.convertToSrt) {
-        timestampStr = timestampStr.replace('.', ','); // '00:05.130 ' -> '00:05,130 ' || ' 00:10.350' -> ' 00:10,350'
+        timestampStr = timestampStr.replace('.', ','); // '00:05.130 '(vtt) -> '00:05,130 '(srt)
     }
 
     if (timestampStr.split(":").length < 3) {
         context.hasFixes = true;
-        timestampStr = '00:' + timestampStr.trim(); // '00:00:05,130' || '00:00:10,350'
+        timestampStr = '00:' + timestampStr.trim(); // (srt/vtt): '00:05,130' -> '00:00:10,350'
     }
 
     return timestampStr;
