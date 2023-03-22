@@ -18,19 +18,24 @@ export function checkFilenameMaxLen(targetFolder: string, srt: string, final: MS
     }
 }
 
-export function preprocessSubtitlesFileFormat(fullFname: string, options: AppOptions) {
+export function preprocessSubtitlesFileFormat(fullFname: string, options: AppOptions): void {
     const ext = path.extname(fullFname).toLowerCase();
 
+    if (ext !== '.vtt' && ext !== '.srt') {
+        return;
+    }
+
+    const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+    let newCnt: ConvertResult;
+
     if (ext === '.vtt') {
-        const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-        const newCnt: ConvertResult = convertVttToSrt(cnt, ConvertAction.fixAndKeepVtt);
-        saveIfNeed(fullFname, newCnt);
+        newCnt = convertVttToSrt(cnt, ConvertAction.fixAndKeepVtt);
     }
     else if (ext === '.srt') {
-        const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-        const newCnt: ConvertResult = fixSrt(cnt);
-        saveIfNeed(fullFname, newCnt);
+        newCnt = fixSrt(cnt);
     }
+    
+    saveIfNeed(fullFname, newCnt);
 
     function saveIfNeed(fullFname: string, newCnt: ConvertResult) {
         if (newCnt.hasFixes) {
