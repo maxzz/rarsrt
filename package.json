@@ -36,12 +36,12 @@
     },
     "dependencies": {
         "chalk": "^4.1.0",
-        "minimist": "1.2.7",
+        "minimist": "1.2.8",
         "rimraf": "^3.0.2"
     },
     "devDependencies": {
         "@types/minimist": "^1.2.2",
-        "@types/node": "18.11.18",
+        "@types/node": "18.15.5",
         "@types/rimraf": "3.0.2"
     }
 }
