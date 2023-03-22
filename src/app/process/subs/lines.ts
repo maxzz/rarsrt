@@ -1,14 +1,16 @@
 import chalk from 'chalk';
 import { getLinesMeaning, SingleLineMeaning, LineType, LineMeaning, splitLineMeaningsToGroups, printLineMeaningsGroups } from "./line-meaning";
-import { ConvertAction } from './types';
 
-export type Context = {
+const enum ConvertAction {
+    convertToSrt,   // convert hh:mm:ss.ms to hh:mm:ss,ms fix hh, and extra conter
+    fixAndKeepVtt,  // keep vtt, but fix mm:ss.ms to hh:mm:ss.ms, and extra conter
+}
+
+type Context = {
     ccCount: number;
     hasFixes: boolean;  // file has default hour timestamps (i.e. mm:ss,ms wo/ hh:)
     action: ConvertAction;
 };
-
-// convert utilities
 
 function convertTimestamp(timestampStr: string, context: Context): string {
     if (context.action === ConvertAction.convertToSrt) {
@@ -22,65 +24,6 @@ function convertTimestamp(timestampStr: string, context: Context): string {
 
     return timestampStr;
 }
-
-/*
-export function convertVttLine(vttLine: string, context: Context): string | undefined {
-
-    if (!vttLine.trim()) {
-        return;
-    }
-
-    let rv = '';
-
-    if (vttLine.match(reg2ItemsLine)) {
-        rv = vttLine.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
-        rv = rv + EOL;
-    }
-    else if (vttLine.match(reg3ItemsLine)) {
-        rv = vttLine.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
-        rv = EOL + rv + EOL;
-    }
-    else if (vttLine.match(regFirstLine)) {
-        rv = vttLine.replace(regFirstLine, '');
-    }
-    else {
-        rv = vttLine + EOL;
-    }
-
-    if (!rv.trim()) {
-        return;
-    }
-
-    if (/^Kind:|^Language:/m.test(rv)) {
-        return;
-    }
-
-    if (/^[0-9]+:/m.test(rv)) {
-        if (context.ccCount === 0) {
-            rv = ++context.ccCount + EOL + rv; // '1\r\n00:00:05,130 --> 00:00:10,350\r\n'
-        } else {
-            rv = EOL + ++context.ccCount + EOL + rv;
-        }
-    }
-
-    return rv;
-}
-
-export function fixVttLine(line: string, context: Context): string {
-    if (!line.trim()) {
-        return line;
-    }
-
-    let vttLine = line;
-
-    if (line.match(reg2ItemsLine)) {
-        const vttComp = line.split('-->');
-        vttLine = vttComp.map((part) => convertTimestamp(part, context)).join(' --> ');
-    }
-
-    return vttLine;
-}
-*/
 
 export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): LineMeaning[][] {
     const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
