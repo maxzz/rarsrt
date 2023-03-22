@@ -10,12 +10,12 @@ export const enum LineType {
     text, // anything else
 }
 
-export type LineMeaning = {
+export type SingleLineMeaning = {
     type: LineType;
     line: string;
 };
 
-export type MultiLineMeaning = {
+export type LineMeaning = {
     type: LineType;
     line: string | string[];
 };
@@ -26,8 +26,8 @@ const regCcCounter = /^\s*\d{1,5}\s*$/g;
 export const reg2ItemsLine = /(\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2})[\.,](\d{3}\s*)/g;
 export const reg3ItemsLine = /(\d{2}:\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2}:\d{2})[\.,](\d{3}\s*)/g;
 
-export function getLinesMeaning(lines: string[]): LineMeaning[] {
-    function getLineMeaning(line: string): LineMeaning {
+export function getLinesMeaning(lines: string[]): SingleLineMeaning[] {
+    function getLineMeaning(line: string): SingleLineMeaning {
         line = line.trim();
         const type =
             line === ''
@@ -44,11 +44,11 @@ export function getLinesMeaning(lines: string[]): LineMeaning[] {
     return lines.map(getLineMeaning);
 }
 
-export function splitLineMeaningsToGroups(lines: LineMeaning[]): MultiLineMeaning[][] {
-    const rvGroups: MultiLineMeaning[][] = [];
+export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeaning[][] {
+    const rvGroups: LineMeaning[][] = [];
 
     let idx = lines[0]?.line.match(regFirstLine) ? 1 : 0; // skip 'WEBVTT'
-    let current: MultiLineMeaning[] = [];
+    let current: LineMeaning[] = [];
 
     for (; idx < lines.length;) {
         const line = lines[idx];
@@ -58,7 +58,7 @@ export function splitLineMeaningsToGroups(lines: LineMeaning[]): MultiLineMeanin
                 current.push(line);
             }
         } else {
-            const consecutive: MultiLineMeaning[] = [line];
+            const consecutive: LineMeaning[] = [line];
 
             while (idx++ < lines.length) {
                 const next = lines[idx];
@@ -71,7 +71,7 @@ export function splitLineMeaningsToGroups(lines: LineMeaning[]): MultiLineMeanin
                 }
             }
 
-            let last: MultiLineMeaning;
+            let last: LineMeaning;
             while ((last = consecutive[consecutive.length - 1]) && last.type === LineType.empty) {
                 consecutive.pop();
             }
@@ -98,8 +98,7 @@ export function splitLineMeaningsToGroups(lines: LineMeaning[]): MultiLineMeanin
     return rvGroups;
 }
 
-/*
-function printLineMeanings(lines: MultiLineMeaning[]) {
+function printLineMeanings(lines: LineMeaning[]) {
     lines.forEach(({ line, type }) => {
         const s = type === LineType.counter ? chalk.cyan('numbr') : type === LineType.stamp ? chalk.yellow('stamp') : type === LineType.empty ? '     ' : type === LineType.text ? chalk.gray(' text') : chalk.red('?');
         const l = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
@@ -107,73 +106,9 @@ function printLineMeanings(lines: MultiLineMeaning[]) {
     });
 }
 
-function printLineMeaningsGroups(lines: MultiLineMeaning[][]) {
+export function printLineMeaningsGroups(lines: LineMeaning[][]) {
     lines.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);
     });
-}
-
-export function printDebugLineMeanings(linesMeaning: LineMeaning[]) {
-    const doGroups = true;
-    const doAll = false;
-
-    if (doGroups) {
-        const groups = splitLineMeaningsToGroups(linesMeaning);
-        printLineMeaningsGroups(groups);
-        process.exit(0);
-    }
-
-    if (doAll) {
-        printLineMeanings(linesMeaning);
-        process.exit(0);
-    }
-}
-*/
-
-function removeEmptyAndCounter(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeaning] | undefined {
-    // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
-    // 2. remove any empty lines
-
-    type GroupItem = {
-        stamp?: LineMeaning;
-        text?: LineMeaning;
-    };
-
-    const items = group.reduce<GroupItem>((acc, cur) => {
-        (cur.type === LineType.stamp) && (acc.stamp = cur);
-        (cur.type === LineType.text) && (acc.text = cur);
-        return acc;
-    }, {});
-
-    const rv: LineMeaning[] = [];
-
-    //rv.push({ type: LineType.counter, line: `${idx + 1}` });
-
-    if (items.stamp && items.text) {
-        return [items.stamp, items.text];
-    }
-}
-
-export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): MultiLineMeaning[][] {
-    const linesMeaning: LineMeaning[] = getLinesMeaning(fileLines);
-    const groups: MultiLineMeaning[][] = splitLineMeaningsToGroups(linesMeaning);
-    const counterlessGroups = groups.map(removeEmptyAndCounter);
-
-    const newGroups = counterlessGroups.map((group, idx) => {
-        if (!group) {
-            console.log(chalk.red('empty group'));
-        }
-
-        const newGroup: MultiLineMeaning[] = [];
-        if (doSrt) {
-            newGroup.push({ type: LineType.counter, line: `${idx + 1}` });
-        }
-        newGroup.push(...group);
-
-        return newGroup;
-    });
-
-    const rv = newGroups.map(removeEmptyAndCounter).filter(Boolean);
-    return rv;
 }
