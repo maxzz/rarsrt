@@ -12,10 +12,10 @@ export type Context = {
 // convert utilities
 
 function convertTimestamp(item: string, context: Context): string {
-    if (context.action === ConvertAction.convert) {
+    if (context.action === ConvertAction.convertToSrt) {
         item = item.replace('.', ','); // '00:05.130 ' -> '00:05,130 ' || ' 00:10.350' -> ' 00:10,350'
     }
-    
+
     if (item.split(":").length < 3) {
         context.hasFixes = true;
         item = '00:' + item.trim(); // '00:00:05,130' || '00:00:10,350'
@@ -82,32 +82,6 @@ export function fixVttLine(line: string, context: Context): string {
     return vttLine;
 }
 
-
-
-function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
-    // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
-    // 2. remove any empty lines
-
-    type GroupItem = {
-        stamp?: SingleLineMeaning;
-        text?: SingleLineMeaning;
-    };
-
-    const items = group.reduce<GroupItem>((acc, cur) => {
-        (cur.type === LineType.stamp) && (acc.stamp = cur);
-        (cur.type === LineType.text) && (acc.text = cur);
-        return acc;
-    }, {});
-
-    const rv: SingleLineMeaning[] = [];
-
-    //rv.push({ type: LineType.counter, line: `${idx + 1}` });
-
-    if (items.stamp && items.text) {
-        return [items.stamp, items.text];
-    }
-}
-
 export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): LineMeaning[][] {
     const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
     const groups: LineMeaning[][] = splitLineMeaningsToGroups(linesMeaning);
@@ -117,6 +91,8 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         if (!group) {
             console.log(chalk.red('empty group'));
         }
+
+        const stamp = group[0];
 
         const newGroup: LineMeaning[] = [];
         if (doSrt) {
@@ -129,4 +105,32 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
 
     const rv = newGroups.map(removeEmptyAndCounter).filter(Boolean);
     return rv;
+
+    function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
+        // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
+        // 2. remove any empty lines
+
+        type GroupItem = {
+            stamp?: SingleLineMeaning;
+            text?: SingleLineMeaning;
+        };
+
+        const items = group.reduce<GroupItem>((acc, cur) => {
+            (cur.type === LineType.stamp) && (acc.stamp = cur);
+            (cur.type === LineType.text) && (acc.text = cur);
+            return acc;
+        }, {});
+
+        const rv: SingleLineMeaning[] = [];
+
+        //rv.push({ type: LineType.counter, line: `${idx + 1}` });
+
+        if (items.stamp && items.text) {
+            return [items.stamp, items.text];
+        }
+    }
+
+    function fixTimestamps() {
+
+    }
 }

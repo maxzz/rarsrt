@@ -99,7 +99,7 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
 
     let newContent: string = fileContent;
 
-    if (action === ConvertAction.convert) {
+    if (action === ConvertAction.convertToSrt) {
         const newLines = fixedLines.map((line) => convertVttLine(line, context));
 
         newContent = newLines.filter((line) => line !== undefined).join('');
