@@ -38,16 +38,13 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
 
     const emptyLine: LineMeaning = { type: LineType.empty, line: '' };
 
-    const newGroups = counterlessGroups.map((stampAndText, idx) => {
-        const stamp = stampAndText[0];
-        stamp.line = stamp.line.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
+    const newGroups = counterlessGroups.map(([stampLine, textLine], idx) => {
+        correctTimestamp(stampLine);
 
-        const newGroup: LineMeaning[] = [];
+        const newGroup: LineMeaning[] = [stampLine, textLine, emptyLine];
         if (doSrt) {
-            newGroup.push({ type: LineType.counter, line: `${idx + 1}` });
+            newGroup.unshift({ type: LineType.counter, line: `${idx + 1}` });
         }
-        newGroup.push(...stampAndText, emptyLine);
-
         return newGroup;
     });
 
@@ -58,6 +55,10 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
     //printLineMeaningsGroups(newGroups);
 
     return newGroups;
+
+    function correctTimestamp(stamp: SingleLineMeaning) {
+        stamp.line = stamp.line.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
+    }
 
     function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
         // 0. remove the previous counter(s) and remove any empty lines
