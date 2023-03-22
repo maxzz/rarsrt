@@ -85,7 +85,7 @@ export function fixVttLine(line: string, context: Context): string {
 export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): LineMeaning[][] {
     const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
     const groups: LineMeaning[][] = splitLineMeaningsToGroups(linesMeaning);
-    const counterlessGroups = groups.map(removeEmptyAndCounter);
+    const counterlessGroups = groups.map(removeEmptyAndCounter).filter(Boolean);
 
     const context: Context = {
         ccCount: 0,
@@ -93,29 +93,23 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         action: ConvertAction.convertToSrt,
     };
 
-    const newGroups = counterlessGroups.map((group, idx) => {
-        if (!group) {
-            console.log(chalk.red('empty group'));
-        }
-
-        const stamp = group[0];
-        stamp.line = convertTimestamp(stamp.line, context);
+    const newGroups = counterlessGroups.map((stampAndText, idx) => {
+        const stamp = stampAndText[0];
+        stamp.line = stamp.line.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
 
         const newGroup: LineMeaning[] = [];
         if (doSrt) {
             newGroup.push({ type: LineType.counter, line: `${idx + 1}` });
         }
-        newGroup.push(...group);
+        newGroup.push(...stampAndText);
 
         return newGroup;
     });
 
-    const rv = newGroups.map(removeEmptyAndCounter).filter(Boolean);
-    return rv;
+    return newGroups;
 
     function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
-        // 1. remove the previous counter(s) and set our own counter, starting at 1 if format .srt (not .vtt)
-        // 2. remove any empty lines
+        // 0. remove the previous counter(s) and remove any empty lines
 
         type GroupItem = {
             stamp?: SingleLineMeaning;
@@ -128,12 +122,10 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
             return acc;
         }, {});
 
-        const rv: SingleLineMeaning[] = [];
-
-        //rv.push({ type: LineType.counter, line: `${idx + 1}` });
-
         if (items.stamp && items.text) {
             return [items.stamp, items.text];
         }
+
+        console.log(chalk.red('Empty group:', JSON.stringify(group)));
     }
 }

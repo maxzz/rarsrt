@@ -98,27 +98,27 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
     return rvGroups;
 }
 
-function printLineMeanings(lineMeaning: LineMeaning[]) {
-    lineMeaning.forEach(({ line, type }) => {
-        const prefix =
-            type === LineType.counter
-                ? chalk.cyan('numbr')
-                : type === LineType.stamp
-                    ? chalk.yellow('stamp')
-                    : type === LineType.empty
-                        ? '     '
-                        : type === LineType.text
-                            ? chalk.gray(' text')
-                            : chalk.red('?');
-                            
-        const txt = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
-        console.log(`${prefix}: ${txt}`);
-    });
-}
-
 export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {
     lineMeaning.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);
     });
+
+    function printLineMeanings(lineMeaning: LineMeaning[]) {
+        lineMeaning.forEach(({ line, type }) => {
+            const prefix =
+                type === LineType.counter
+                    ? chalk.cyan('numbr')
+                    : type === LineType.stamp
+                        ? chalk.yellow('stamp')
+                        : type === LineType.empty
+                            ? '     '
+                            : type === LineType.text
+                                ? chalk.gray(' text')
+                                : chalk.red('?');
+                                
+            const txt = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
+            console.log(`${prefix}: ${txt}`);
+        });
+    }
 }
