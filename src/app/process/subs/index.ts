@@ -1,7 +1,10 @@
-import { ConvertResult } from './types';
 import { combineLineMeaningGroups } from './line-meaning';
 import { processWithGroups } from './lines';
-export * from './types';
+
+export type ConvertResult = {
+    newContent: string;
+    hasFixes: boolean;
+};
 
 export function convertSubtitles({ fileContent, doSrt }: { fileContent: string, doSrt: boolean; }): ConvertResult {
     const fileLines = fileContent.split(/\r?\n/);
