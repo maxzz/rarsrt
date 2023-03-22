@@ -98,6 +98,16 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
     return rvGroups;
 }
 
+export function combineLineMeanings(lineMeaning: LineMeaning[][]) {
+    const newContent = lineMeaning.map(
+        (group) => group.map(
+            ({ line }) => typeof line === 'string' ? line : line.join(EOL)
+        ).join(EOL)
+    ).join(EOL);
+
+    return newContent;
+}
+
 export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {
     lineMeaning.forEach((group) => {
         console.log(chalk.green('start:'));
