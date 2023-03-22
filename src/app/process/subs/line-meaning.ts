@@ -12,6 +12,11 @@ export const enum LineType {
 
 export type LineMeaning = {
     type: LineType;
+    line: string;
+};
+
+export type MultiLineMeaning = {
+    type: LineType;
     line: string | string[];
 };
 
@@ -36,36 +41,69 @@ export function getLinesMeaning(lines: string[]): LineMeaning[] {
     return lines.map(getLineMeaning);
 }
 
-export function splitLineMeaningsToGroups(lines: LineMeaning[]) {
-    const groups: LineMeaning[][] = [];
-    let current: LineMeaning[] = [];
+export function splitLineMeaningsToGroups(lines: LineMeaning[]): MultiLineMeaning[][] {
+    const rvGroups: MultiLineMeaning[][] = [];
 
-    lines.forEach((line) => {
-        current.push(line);
+    let idx = lines[0]?.line.match(regFirstLine) ? 1 : 0; // skip 'WEBVTT'
+    let current: MultiLineMeaning[] = [];
 
-        if (line.type === LineType.text) {
-            if (current.length) {
-                groups.push(current);
+    for (; idx < lines.length;) {
+        const line = lines[idx];
+
+        if (line.type !== LineType.text) {
+            if (line.type !== LineType.empty) { // empty lines before the first timestamp
+                current.push(line);
             }
-            current = [];
-        }
-    });
+        } else {
+            const consecutive: MultiLineMeaning[] = [line];
 
-    if (current.length) {
-        groups.push(current);
+            while (idx++ < lines.length) {
+                const next = lines[idx];
+                const isConsecutive = next && (next.type === LineType.text || next.type === LineType.empty);
+                if (isConsecutive) {
+                    consecutive.push(next);
+                } else {
+                    idx--;
+                    break;
+                }
+            }
+
+            let last: MultiLineMeaning;
+            while ((last = consecutive[consecutive.length - 1]) && last.type === LineType.empty) {
+                consecutive.pop();
+            }
+
+            if (consecutive.length > 1) {
+                current.push({ type: LineType.text, line: consecutive.map(({ line }) => line as string) });
+            } else if (consecutive.length) {
+                current.push(...consecutive);
+            }
+
+            if (current.length) {
+                rvGroups.push(current);
+                current = [];
+            }
+        }
+
+        idx++;
     }
 
-    return groups;
+    if (current.length) {
+        rvGroups.push(current);
+    }
+
+    return rvGroups;
 }
 
-export function printLineMeanings(lines: LineMeaning[]) {
+export function printLineMeanings(lines: MultiLineMeaning[]) {
     lines.forEach(({ line, type }) => {
         const s = type === LineType.counter ? chalk.cyan('numbr') : type === LineType.stamp ? chalk.yellow('stamp') : type === LineType.empty ? '     ' : type === LineType.text ? chalk.gray(' text') : chalk.red('?');
-        console.log(`${s}: ${line}`);
+        const l = typeof line === 'string' ? line : line.join(EOL);
+        console.log(`${s}: ${l}`);
     });
 }
 
-export function printLineMeaningsGroups(lines: LineMeaning[][]) {
+export function printLineMeaningsGroups(lines: MultiLineMeaning[][]) {
     lines.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);
@@ -75,7 +113,7 @@ export function printLineMeaningsGroups(lines: LineMeaning[][]) {
 export function printDebugLineMeanings(linesMeaning: LineMeaning[]) {
     const doGroups = true;
     const doAll = false;
-    
+
     if (doGroups) {
         const groups = splitLineMeaningsToGroups(linesMeaning);
         printLineMeaningsGroups(groups);
@@ -113,14 +151,14 @@ function fixSrtGroup(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeani
 }
 
 export function processWithGroups(fileLines: string[]) {
-    
+
     const linesMeaning = getLinesMeaning(fileLines);
     const groups = splitLineMeaningsToGroups(linesMeaning);
 
     const fixedGroups = groups.map(fixSrtGroup).filter(Boolean);
-    
+
     const isSrt = true;
-    
+
     const newGroups = fixedGroups.map((group, idx) => {
         if (!group) {
             console.log(chalk.red('empty group'));
@@ -132,7 +170,7 @@ export function processWithGroups(fileLines: string[]) {
         newGroup.push(...group);
         return newGroup;
     });
-    
+
     //printLineMeaningsGroups(groups);
     printLineMeaningsGroups(newGroups);
 }

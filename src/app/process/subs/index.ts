@@ -1,12 +1,12 @@
 import chalk from 'chalk';
 import { group } from 'console';
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, printDebugLineMeanings, printLineMeaningsGroups, processWithGroups, splitLineMeaningsToGroups } from './line-meaning';
+import { getLinesMeaning, LineMeaning, LineType, MultiLineMeaning, printDebugLineMeanings, printLineMeaningsGroups, processWithGroups, splitLineMeaningsToGroups } from './line-meaning';
 import { Context, convertLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
 
-function removeVttCounters(linesMeaning: LineMeaning[], context: Context): string[] {
+function removeVttCounters(linesMeaning: MultiLineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
     const nonEmpty = transformedLines.filter(Boolean);
 
@@ -27,7 +27,7 @@ function removeVttCounters(linesMeaning: LineMeaning[], context: Context): strin
         9:''
         length:10
     */
-    function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
+    function transformLine(type: MultiLineMeaning, idx: number, arr: MultiLineMeaning[]): MultiLineMeaning | undefined {
         const isCounter =
             type.type === LineType.counter && arr[idx + 1]?.type === LineType.stamp;
 
@@ -36,7 +36,7 @@ function removeVttCounters(linesMeaning: LineMeaning[], context: Context): strin
     }
 }
 
-function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context): string[] {
+function removeSrtDoubleCounters(linesMeaning: MultiLineMeaning[], context: Context): string[] {
     const transformedLines = linesMeaning.map(transformLine);
     const nonEmpty = transformedLines.filter((type) => type !== undefined);
 
@@ -68,7 +68,7 @@ function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context):
     */
     //const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line); //double lines before counter
 
-    function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
+    function transformLine(type: MultiLineMeaning, idx: number, arr: MultiLineMeaning[]): MultiLineMeaning | undefined {
         const isDoubleCounter =
             type.type === LineType.counter && (
                 (
