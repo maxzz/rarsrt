@@ -23,7 +23,7 @@ function convertTimestamp(item: string, context: Context): string {
     return item;
 }
 
-export function convertLine(line: string, context: Context): string | undefined {
+export function convertVttLine(line: string, context: Context): string | undefined {
 
     if (!line.trim()) {
         return;

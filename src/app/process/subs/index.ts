@@ -1,8 +1,7 @@
 import chalk from 'chalk';
-import { group } from 'console';
 import { EOL } from 'os';
-import { getLinesMeaning, LineMeaning, LineType, MultiLineMeaning, printDebugLineMeanings, printLineMeaningsGroups, processWithGroups, splitLineMeaningsToGroups } from './line-meaning';
-import { Context, convertLine, fixVttLine } from './lines';
+import { getLinesMeaning, LineType, MultiLineMeaning, processWithGroups } from './line-meaning';
+import { Context, convertVttLine, fixVttLine } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
 
@@ -10,7 +9,7 @@ function removeVttCounters(linesMeaning: MultiLineMeaning[], context: Context): 
     const transformedLines = linesMeaning.map(transformLine);
     const nonEmpty = transformedLines.filter(Boolean);
 
-    const newLines = nonEmpty.map((type) => typeof type.line === 'string' ? type.line : type.line.join(EOL) ); // use Boolean here to skip empty lines
+    const newLines = nonEmpty.map((type) => typeof type.line === 'string' ? type.line : type.line.join(EOL)); // use Boolean here to skip empty lines
     return newLines;
 
     /*
@@ -95,17 +94,18 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
 
-    printDebugLineMeanings(linesMeaning);
+    //printDebugLineMeanings(linesMeaning);
 
     const fixedLines = removeVttCounters(linesMeaning, context);
 
     let newContent: string = fileContent;
 
     if (action === ConvertAction.convert) {
-        const newLines = fixedLines.map((line) => convertLine(line, context));
+        const newLines = fixedLines.map((line) => convertVttLine(line, context));
 
         newContent = newLines.filter((line) => line !== undefined).join('');
-    } else if (action === ConvertAction.fix) {
+    }
+    else if (action === ConvertAction.fix) {
         const newLines = fixedLines.map((line) => fixVttLine(line, context));
 
         newContent = newLines.filter((line) => line !== undefined).join(EOL);
@@ -126,18 +126,14 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     const fileLines = fileContent.split(/\r?\n/);
 
-    processWithGroups(fileLines);
+    const newGroups = processWithGroups({ fileLines, doSrt: true });
+    //printLineMeaningsGroups(newGroups);
 
     process.exit(0);
 
     const linesMeaning = getLinesMeaning(fileLines);
-
-    //printDebugLineMeanings(linesMeaning);
-
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
-
     const newLines = fixedLines.map((line) => fixVttLine(line, context));
-
     const newContent = newLines.filter((line) => line !== undefined).join(EOL);
 
     return {
