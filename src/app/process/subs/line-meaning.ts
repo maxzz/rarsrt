@@ -60,7 +60,7 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
         } else {
             const consecutive: LineMeaning[] = [line];
 
-            while (idx++ < lines.length) {
+            while (idx++ < lines.length) { // collect following text and empty lines
                 const next = lines[idx];
                 const isConsecutive = next && (next.type === LineType.text || next.type === LineType.empty);
                 if (isConsecutive) {
@@ -98,16 +98,26 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
     return rvGroups;
 }
 
-function printLineMeanings(lines: LineMeaning[]) {
-    lines.forEach(({ line, type }) => {
-        const s = type === LineType.counter ? chalk.cyan('numbr') : type === LineType.stamp ? chalk.yellow('stamp') : type === LineType.empty ? '     ' : type === LineType.text ? chalk.gray(' text') : chalk.red('?');
-        const l = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
-        console.log(`${s}: ${l}`);
+function printLineMeanings(lineMeaning: LineMeaning[]) {
+    lineMeaning.forEach(({ line, type }) => {
+        const prefix =
+            type === LineType.counter
+                ? chalk.cyan('numbr')
+                : type === LineType.stamp
+                    ? chalk.yellow('stamp')
+                    : type === LineType.empty
+                        ? '     '
+                        : type === LineType.text
+                            ? chalk.gray(' text')
+                            : chalk.red('?');
+                            
+        const txt = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
+        console.log(`${prefix}: ${txt}`);
     });
 }
 
-export function printLineMeaningsGroups(lines: LineMeaning[][]) {
-    lines.forEach((group) => {
+export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {
+    lineMeaning.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);
     });

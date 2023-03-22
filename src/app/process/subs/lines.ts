@@ -131,6 +131,6 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
     }
 
     function fixTimestamps() {
-
+        //TODO: convert timestamp if need it
     }
 }
