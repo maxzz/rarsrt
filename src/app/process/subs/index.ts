@@ -1,4 +1,9 @@
-import { EOL } from 'os';
+import { ConvertResult } from './types';
+import { combineLineMeaningGroups } from './line-meaning';
+import { processWithGroups } from './lines';
+export * from './types';
+
+/*
 import { getLinesMeaning, LineType, LineMeaning, printLineMeaningsGroups, combineLineMeaningGroups } from './line-meaning';
 import { Context, convertVttLine, fixVttLine, processWithGroups } from './lines';
 import { ConvertAction, ConvertResult } from './types';
@@ -24,7 +29,7 @@ function removeVttCounters(linesMeaning: LineMeaning[], context: Context): strin
         8:'but before we start, let's create our own logging category.'
         9:''
         length:10
-    */
+    * /
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
         const isCounter =
             type.type === LineType.counter && arr[idx + 1]?.type === LineType.stamp;
@@ -51,7 +56,7 @@ function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context):
         5:'2'
         6:'00:00:08,450 --> 00:00:16,640'
         7:'go before nouns and show the relationship between the noun and the rest of the sentence. There are'
-    */
+    * /
     /*
     Bad format (between line 4 and 6 is empty line):
         0:{type: 0, line: '0'}
@@ -63,7 +68,7 @@ function removeSrtDoubleCounters(linesMeaning: LineMeaning[], context: Context):
         6:{type: 0, line: '2'}
         7:{type: 1, line: '00:00:08,450 --> 00:00:16,640'}
         8:{type: 3, line: 'go before nouns and show the relationship betw… noun and the rest of the sentence. There are'}
-    */
+    * /
     //const newLines = getLinesMeaning(lines).map(transformLine).filter(Boolean).map((type) => type.type === LineType.counter ? `${EOL}${type.line}` : type.line); //double lines before counter
 
     function transformLine(type: LineMeaning, idx: number, arr: LineMeaning[]): LineMeaning | undefined {
@@ -123,18 +128,6 @@ export function fixSrt(fileContent: string): ConvertResult {
     };
 
     const fileLines = fileContent.split(/\r?\n/);
-    const newGroups = processWithGroups({ fileLines, doSrt: true });
-    const newContent = combineLineMeaningGroups(newGroups);
-
-    return {
-        newContent,
-        hasFixes: true,
-    };
-
-    /*
-    process.exit(0);
-
-    const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
 
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
@@ -146,5 +139,16 @@ export function fixSrt(fileContent: string): ConvertResult {
         newContent,
         hasFixes: context.hasFixes,
     };
-    */
+}
+*/
+
+export function convertSubtitles({ fileContent, doSrt }: { fileContent: string, doSrt: boolean; }): ConvertResult {
+    const fileLines = fileContent.split(/\r?\n/);
+    const newGroups = processWithGroups({ fileLines, doSrt });
+    const newContent = combineLineMeaningGroups(newGroups);
+
+    return {
+        newContent,
+        hasFixes: true,
+    };
 }

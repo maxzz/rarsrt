@@ -1,6 +1,5 @@
 import chalk from 'chalk';
-import { EOL } from 'os';
-import { getLinesMeaning, SingleLineMeaning, LineType, LineMeaning, reg2ItemsLine, reg3ItemsLine, regFirstLine, splitLineMeaningsToGroups, printLineMeaningsGroups } from "./line-meaning";
+import { getLinesMeaning, SingleLineMeaning, LineType, LineMeaning, splitLineMeaningsToGroups, printLineMeaningsGroups } from "./line-meaning";
 import { ConvertAction } from './types';
 
 export type Context = {
@@ -24,6 +23,7 @@ function convertTimestamp(timestampStr: string, context: Context): string {
     return timestampStr;
 }
 
+/*
 export function convertVttLine(vttLine: string, context: Context): string | undefined {
 
     if (!vttLine.trim()) {
@@ -80,6 +80,7 @@ export function fixVttLine(line: string, context: Context): string {
 
     return vttLine;
 }
+*/
 
 export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): LineMeaning[][] {
     const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
@@ -104,10 +105,14 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         }
         newGroup.push(...stampAndText, emptyLine);
 
-        //printLineMeaningsGroups(newGroups);
-
         return newGroup;
     });
+
+    if (!doSrt) {
+        newGroups.unshift([{ type: LineType.text, line: 'WEBVTT' }, emptyLine]);
+    }
+
+    //printLineMeaningsGroups(newGroups);
 
     return newGroups;
 
