@@ -87,13 +87,19 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
     const groups: LineMeaning[][] = splitLineMeaningsToGroups(linesMeaning);
     const counterlessGroups = groups.map(removeEmptyAndCounter);
 
+    const context: Context = {
+        ccCount: 0,
+        hasFixes: false,
+        action: ConvertAction.convertToSrt,
+    };
+
     const newGroups = counterlessGroups.map((group, idx) => {
         if (!group) {
             console.log(chalk.red('empty group'));
         }
 
         const stamp = group[0];
-        stamp.line = fixTimestamps(stamp.line);
+        stamp.line = convertTimestamp(stamp.line, context);
 
         const newGroup: LineMeaning[] = [];
         if (doSrt) {
@@ -129,16 +135,5 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         if (items.stamp && items.text) {
             return [items.stamp, items.text];
         }
-    }
-
-    function fixTimestamps(timestampStr: string): string {
-        const context: Context = {
-            ccCount: 0,
-            hasFixes: false,
-            action: ConvertAction.convertToSrt,
-        };
-
-        const rv = convertTimestamp(timestampStr, context);
-        return rv;
     }
 }
