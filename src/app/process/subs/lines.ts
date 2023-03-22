@@ -11,17 +11,17 @@ export type Context = {
 
 // convert utilities
 
-function convertTimestamp(item: string, context: Context): string {
+function convertTimestamp(timestampStr: string, context: Context): string {
     if (context.action === ConvertAction.convertToSrt) {
-        item = item.replace('.', ','); // '00:05.130 ' -> '00:05,130 ' || ' 00:10.350' -> ' 00:10,350'
+        timestampStr = timestampStr.replace('.', ','); // '00:05.130 ' -> '00:05,130 ' || ' 00:10.350' -> ' 00:10,350'
     }
 
-    if (item.split(":").length < 3) {
+    if (timestampStr.split(":").length < 3) {
         context.hasFixes = true;
-        item = '00:' + item.trim(); // '00:00:05,130' || '00:00:10,350'
+        timestampStr = '00:' + timestampStr.trim(); // '00:00:05,130' || '00:00:10,350'
     }
 
-    return item;
+    return timestampStr;
 }
 
 export function convertVttLine(line: string, context: Context): string | undefined {
@@ -93,6 +93,7 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         }
 
         const stamp = group[0];
+        stamp.line = fixTimestamps(stamp.line);
 
         const newGroup: LineMeaning[] = [];
         if (doSrt) {
@@ -130,7 +131,14 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         }
     }
 
-    function fixTimestamps() {
-        //TODO: convert timestamp if need it
+    function fixTimestamps(timestampStr: string): string {
+        const context: Context = {
+            ccCount: 0,
+            hasFixes: false,
+            action: ConvertAction.convertToSrt,
+        };
+
+        const rv = convertTimestamp(timestampStr, context);
+        return rv;
     }
 }
