@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { EOL } from 'os';
-import { getLinesMeaning, SingleLineMeaning, LineType, LineMeaning, reg2ItemsLine, reg3ItemsLine, regFirstLine, splitLineMeaningsToGroups } from "./line-meaning";
+import { getLinesMeaning, SingleLineMeaning, LineType, LineMeaning, reg2ItemsLine, reg3ItemsLine, regFirstLine, splitLineMeaningsToGroups, printLineMeaningsGroups } from "./line-meaning";
 import { ConvertAction } from './types';
 
 export type Context = {
@@ -24,47 +24,46 @@ function convertTimestamp(timestampStr: string, context: Context): string {
     return timestampStr;
 }
 
-export function convertVttLine(line: string, context: Context): string | undefined {
-
-    if (!line.trim()) {
-        return;
-    }
-
-    let vttLine = '';
-
-    if (line.match(reg2ItemsLine)) {
-        const vttComp = line.split('-->');
-        vttLine = vttComp.map((part) => convertTimestamp(part, context)).join(' --> ');
-        vttLine = vttLine + EOL;
-    }
-    else if (line.match(reg3ItemsLine)) {
-        const vttComp = line.split('-->');
-        vttLine = vttComp.map((part) => convertTimestamp(part, context)).join(' --> ');
-        vttLine = EOL + vttLine + EOL;
-    }
-    else if (line.match(regFirstLine)) {
-        vttLine = line.replace(regFirstLine, '');
-    }
-    else {
-        vttLine = line + EOL;
-    }
+export function convertVttLine(vttLine: string, context: Context): string | undefined {
 
     if (!vttLine.trim()) {
         return;
     }
 
-    if (/^Kind:|^Language:/m.test(vttLine)) {
+    let rv = '';
+
+    if (vttLine.match(reg2ItemsLine)) {
+        rv = vttLine.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
+        rv = rv + EOL;
+    }
+    else if (vttLine.match(reg3ItemsLine)) {
+        rv = vttLine.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
+        rv = EOL + rv + EOL;
+    }
+    else if (vttLine.match(regFirstLine)) {
+        rv = vttLine.replace(regFirstLine, '');
+    }
+    else {
+        rv = vttLine + EOL;
+    }
+
+    if (!rv.trim()) {
         return;
     }
 
-    if (/^[0-9]+:/m.test(vttLine)) {
+    if (/^Kind:|^Language:/m.test(rv)) {
+        return;
+    }
+
+    if (/^[0-9]+:/m.test(rv)) {
         if (context.ccCount === 0) {
-            vttLine = ++context.ccCount + EOL + vttLine; // '1\r\n00:00:05,130 --> 00:00:10,350\r\n'
+            rv = ++context.ccCount + EOL + rv; // '1\r\n00:00:05,130 --> 00:00:10,350\r\n'
         } else {
-            vttLine = EOL + ++context.ccCount + EOL + vttLine;
+            rv = EOL + ++context.ccCount + EOL + rv;
         }
     }
-    return vttLine;
+
+    return rv;
 }
 
 export function fixVttLine(line: string, context: Context): string {
@@ -90,7 +89,7 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
     const context: Context = {
         ccCount: 0,
         hasFixes: false,
-        action: ConvertAction.convertToSrt,
+        action: doSrt ? ConvertAction.convertToSrt : ConvertAction.fixAndKeepVtt,
     };
 
     const emptyLine: LineMeaning = { type: LineType.empty, line: '' };
@@ -104,6 +103,8 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
             newGroup.push({ type: LineType.counter, line: `${idx + 1}` });
         }
         newGroup.push(...stampAndText, emptyLine);
+
+        //printLineMeaningsGroups(newGroups);
 
         return newGroup;
     });

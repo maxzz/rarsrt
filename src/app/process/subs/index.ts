@@ -123,11 +123,7 @@ export function fixSrt(fileContent: string): ConvertResult {
     };
 
     const fileLines = fileContent.split(/\r?\n/);
-
     const newGroups = processWithGroups({ fileLines, doSrt: true });
-
-    printLineMeaningsGroups(newGroups);
-
     const newContent = combineLineMeaningGroups(newGroups);
 
     return {
