@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { getLinesMeaning, LineType, LineMeaning, printLineMeaningsGroups, combineLineMeanings } from './line-meaning';
+import { getLinesMeaning, LineType, LineMeaning, printLineMeaningsGroups, combineLineMeaningGroups } from './line-meaning';
 import { Context, convertVttLine, fixVttLine, processWithGroups } from './lines';
 import { ConvertAction, ConvertResult } from './types';
 export * from './types';
@@ -102,7 +102,8 @@ export function convertVttToSrt(fileContent: string, action: ConvertAction): Con
 
         newContent = newLines.filter((line) => line !== undefined).join('');
     }
-    else if (action === ConvertAction.fix) {
+    else if (action === ConvertAction.fixAndKeepVtt) {
+        //TODO: this is the same as done in fixSrt()
         const newLines = fixedLines.map((line) => fixVttLine(line, context));
 
         newContent = newLines.filter((line) => line !== undefined).join(EOL);
@@ -118,7 +119,7 @@ export function fixSrt(fileContent: string): ConvertResult {
     const context: Context = {
         ccCount: 0,
         hasFixes: false,
-        action: ConvertAction.fix,
+        action: ConvertAction.fixAndKeepVtt,
     };
 
     const fileLines = fileContent.split(/\r?\n/);
@@ -127,7 +128,7 @@ export function fixSrt(fileContent: string): ConvertResult {
 
     printLineMeaningsGroups(newGroups);
 
-    const newContent = combineLineMeanings(newGroups);
+    const newContent = combineLineMeaningGroups(newGroups);
 
     return {
         newContent,
@@ -137,7 +138,9 @@ export function fixSrt(fileContent: string): ConvertResult {
     /*
     process.exit(0);
 
+    const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning = getLinesMeaning(fileLines);
+
     const fixedLines = removeSrtDoubleCounters(linesMeaning, context);
 
     const newLines = fixedLines.map((line) => fixVttLine(line, context));

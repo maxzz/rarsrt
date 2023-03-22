@@ -7,7 +7,7 @@ import { AppOptions } from "../app-types";
 import { MSPair } from "./matched-pairs";
 import { ConvertAction, ConvertResult, convertVttToSrt, fixSrt } from "./subs";
 
-export function checkMaxLength(targetFolder: string, srt: string, final: MSPair[]) {
+export function checkFilenameMaxLen(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {
         process.stdout.write(`   \r`);
 
@@ -18,21 +18,21 @@ export function checkMaxLength(targetFolder: string, srt: string, final: MSPair[
     }
 }
 
-export function checkSubtitlesFormat(fullFname: string, options: AppOptions) {
+export function preprocessSubtitlesFileFormat(fullFname: string, options: AppOptions) {
     const ext = path.extname(fullFname).toLowerCase();
 
     if (ext === '.vtt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-        const newCnt: ConvertResult = convertVttToSrt(cnt, ConvertAction.fix);
-
-        if (newCnt.hasFixes) {
-            createBackup(fullFname);
-            fs.writeFileSync(fullFname, newCnt.newContent);
-        }
-    } else if (ext === '.srt') {
+        const newCnt: ConvertResult = convertVttToSrt(cnt, ConvertAction.fixAndKeepVtt);
+        saveIfNeed(fullFname, newCnt);
+    }
+    else if (ext === '.srt') {
         const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
         const newCnt: ConvertResult = fixSrt(cnt);
+        saveIfNeed(fullFname, newCnt);
+    }
 
+    function saveIfNeed(fullFname: string, newCnt: ConvertResult) {
         if (newCnt.hasFixes) {
             createBackup(fullFname);
             fs.writeFileSync(fullFname, newCnt.newContent);

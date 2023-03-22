@@ -5,7 +5,7 @@ import { notes } from './app-notes';
 import { ffmpegUtils } from '../utils/utils-ffmpeg';
 import { LineAnimation } from './app-messages';
 import { getAppOptions } from './app-arguments';
-import { checkMaxLength, checkSubtitlesFormat, getMSPairs, MSPair } from './process';
+import { checkFilenameMaxLen, preprocessSubtitlesFileFormat, getMSPairs, MSPair } from './process';
 
 function oneFileAction(animation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
     const mp4FullFname = path.join(targetFolder, shortMp4);
@@ -14,8 +14,8 @@ function oneFileAction(animation: LineAnimation, targetFolder: string, shortMp4:
 
     const appOptions = getAppOptions();
 
-    checkMaxLength(targetFolder, srtFullFname, final);
-    checkSubtitlesFormat(srtFullFname, appOptions);
+    checkFilenameMaxLen(targetFolder, srtFullFname, final);
+    preprocessSubtitlesFileFormat(srtFullFname, appOptions);
 
     animation.writeStateLine(shortMp4);
     

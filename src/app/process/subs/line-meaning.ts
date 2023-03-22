@@ -98,7 +98,7 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
     return rvGroups;
 }
 
-export function combineLineMeanings(lineMeaning: LineMeaning[][]) {
+export function combineLineMeaningGroups(lineMeaning: LineMeaning[][]) {
     const newContent = lineMeaning.map(
         (group) => group.map(
             ({ line }) => typeof line === 'string' ? line : line.join(EOL)
