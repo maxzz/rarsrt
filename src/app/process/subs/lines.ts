@@ -93,6 +93,8 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         action: ConvertAction.convertToSrt,
     };
 
+    const emptyLine: LineMeaning = { type: LineType.empty, line: '' };
+
     const newGroups = counterlessGroups.map((stampAndText, idx) => {
         const stamp = stampAndText[0];
         stamp.line = stamp.line.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
@@ -101,7 +103,7 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         if (doSrt) {
             newGroup.push({ type: LineType.counter, line: `${idx + 1}` });
         }
-        newGroup.push(...stampAndText);
+        newGroup.push(...stampAndText, emptyLine);
 
         return newGroup;
     });
