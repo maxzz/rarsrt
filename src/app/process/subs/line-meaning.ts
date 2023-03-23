@@ -27,6 +27,10 @@ const reg2ItemsLine = /(\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2})[\.,](\d{3
 const reg3ItemsLine = /(\d{2}:\d{2}:\d{2})[\.,](\d{3}\s+)-->(\s+\d{2}:\d{2}:\d{2})[\.,](\d{3}\s*)/g;
 
 export function getLinesMeaning(lines: string[]): SingleLineMeaning[] {
+    const linesMeaning = lines.map(getLineMeaning);
+    fixStartDotTextLinesInPlace(linesMeaning);
+    return linesMeaning;
+
     function getLineMeaning(line: string): SingleLineMeaning {
         line = line.trim();
         const type =
@@ -41,7 +45,17 @@ export function getLinesMeaning(lines: string[]): SingleLineMeaning[] {
                             : LineType.text;
         return { type, line };
     }
-    return lines.map(getLineMeaning);
+
+    function fixStartDotTextLinesInPlace(lineMeaning: SingleLineMeaning[]) {
+        function fix(lineMeaning: SingleLineMeaning) {
+            if (lineMeaning.type === LineType.text) {
+                const first = lineMeaning.line?.charAt(0);
+                const removeFirst = first === '\u202B'; // || first === '?' //right-to-left embedding (U+202B) //i.e. "‫.Both projects" -> "Both projects."
+                removeFirst && (lineMeaning.line = lineMeaning.line.substring(1));
+            }
+        }
+        lineMeaning.forEach(fix);
+    }
 }
 
 export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeaning[][] {
@@ -126,7 +140,7 @@ export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {
                             : type === LineType.text
                                 ? chalk.gray(' text')
                                 : chalk.red('?');
-                                
+
             const txt = typeof line === 'string' ? line : `\n${line.join(EOL)}`;
             console.log(`${prefix}: ${txt}`);
         });
