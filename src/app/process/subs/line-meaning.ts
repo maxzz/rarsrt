@@ -54,7 +54,7 @@ export function getLinesMeaning(lines: string[]): SingleLineMeaning[] {
                 removeFirst && (lineMeaning.line = lineMeaning.line.substring(1));
             }
         }
-        lineMeaning.forEach(fix);
+        lineMeaning.forEach(fix); //TODO: this can be controlled by CLI, but now it's OK.
     }
 }
 
