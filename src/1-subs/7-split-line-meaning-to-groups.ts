@@ -58,13 +58,3 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LineMeani
 
     return rvGroups;
 }
-
-export function combineLineMeaningGroups(lineMeaning: LineMeaning[][]) {
-    const newContent = lineMeaning.map(
-        (group) => group.map(
-            ({ lineMulti: line }) => typeof line === 'string' ? line : line.join(EOL)
-        ).join(EOL)
-    ).join(EOL);
-
-    return newContent;
-}
