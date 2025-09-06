@@ -1,8 +1,8 @@
 {
     "name": "rarsrt",
-    "version": "1.2.4",
+    "version": "1.25.1",
     "author": "Max Zakharzhevskiy",
-    "description": "Utility to combine .SRT subtitles with .MP4 files inside specified folders.",
+    "description": "Utility to merge .SRT subtitles with .MP4 files inside specified folders.",
     "license": "MIT",
     "main": "dist/cli.js",
     "bin": "dist/cli.js",
@@ -43,11 +43,8 @@
         "rimraf": "^3.0.2"
     },
     "scripts": {
-        "dev": "tsc -w",
-        "build1": "tsup src/index.ts --format cjs --clean",
+        "tsc": "tsc -w",
         "build": "tsup src/index.ts --format cjs --clean && pkg -t node18-win-x64 -o mergesubs dist/index.js",
-        "_build": "rm -rf dist && tsc",
-        "_prepublish": "pnpm build",
-        "_makebin": "pnpm build && pkg -t node18-win-x64 -o mergesubs dist/index.js"
+        "prepublish": "npm run build"
     }
 }
