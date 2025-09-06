@@ -5,9 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "tsx",
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "runtimeExecutable": "tsx",
+            "program": "${workspaceFolder}/src/index.ts",
+            "skipFiles": [
+                "<node_internals>/**",
+                "${workspaceFolder}/node_modules/**",
+            ],
+            "args": [
+                //"C:/Users/maxzz/Desktop/New folder",
+                "C:/Users/maxzz/Desktop/03.20.23", // from "C:/Y/w/1-node/1-utils/merge-video-subtitles/tests/03.20.23",
+
+                "--preserve",
+                "--keeporg",
+            ],
+        },
+        {
+            "name": "Launch old",
+            "type": "node",
+            "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
             ],
