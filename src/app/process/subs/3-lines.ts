@@ -1,7 +1,8 @@
 import chalk from 'chalk';
 import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
 import { getLinesMeaning } from './1-split-lines';
-import { splitLineMeaningsToGroups, printLineMeaningsGroups } from "./line-meaning";
+import { printLineMeaningsGroups } from './8-print-line-groups';
+import { splitLineMeaningsToGroups } from "./2-line-meaning";
 
 const enum ConvertAction {
     convertToSrt,   // convert hh:mm:ss.ms to hh:mm:ss,ms fix hh, and extra conter
