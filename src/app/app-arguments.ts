@@ -5,7 +5,7 @@ import { AppOptions, Targets } from './app-types';
 import { OsStuff } from '../utils/utils-os-stuff';
 
 function checkArg(argTargets: string[]): Targets {
-    let rv = {
+    let rv: Targets = {
         files: [],
         dirs: [],
     };
