@@ -1,8 +1,8 @@
 import { EOL } from "os";
 import { type SingleLineMeaning, type LinesGroup } from "./9-types";
-import { processWithGroups } from "./1-lines";
+import { processLineGroups } from "./1-process-line-groups";
 import { getLinesMeaning } from "./6-get-lines-meaning";
-import { splitLineMeaningsToGroups } from "./7-split-line-meaning-to-groups";
+import { splitToLineGroups } from "./7-split-to-line-groups";
 
 type ConvertSubtitlesParams = {
     fileContent: string;    // The file content to be processed.
@@ -17,9 +17,9 @@ export type ConvertSubtitlesResult = {
 export function convertSubtitles({ fileContent, doSrt }: ConvertSubtitlesParams): ConvertSubtitlesResult {
     const fileLines = fileContent.split(/\r?\n/);
     const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
-    const groups: LinesGroup[] = splitLineMeaningsToGroups(linesMeaning);
+    const lineGroups: LinesGroup[] = splitToLineGroups(linesMeaning);
 
-    const newGroups = processWithGroups({ groups, doSrt });
+    const newGroups = processLineGroups({ lineGroups, doSrt });
 
     const newContent = combineLineMeaningGroups(newGroups);
 

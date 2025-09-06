@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { EOL } from "os";
-import { LineType, type LinesGroup } from "./9-types";
+import { type LinesGroup, LineType } from "./9-types";
 
-export function printLineMeaningsGroups(lineMeaning: LinesGroup[]) {
+export function printLineGroups(lineMeaning: LinesGroup[]) {
     lineMeaning.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);

@@ -1,17 +1,15 @@
 import chalk from "chalk";
-import { type LinesGroup, type LineMeaning, LineType } from "./9-types";
-import { printLineMeaningsGroups } from "./8-print-line-groups";
+import { type LinesGroup, type LineCnt, LineType } from "./9-types";
+import { printLineGroups } from "./8-print-line-groups";
 
-export function processWithGroups({ groups, doSrt }: { groups: LinesGroup[], doSrt: boolean; }): LinesGroup[] {
-    const counterlessGroups = groups.map(removeEmptyAndCounter).filter(Boolean);
-
+export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGroup[], doSrt: boolean; }): LinesGroup[] {
     const context: Context = {
-        ccCount: 0,
-        hasFixes: false,
+        hasFixes: false, // TODO: return this value to the caller.
         action: doSrt ? ConvertAction.convertToSrt : ConvertAction.fixAndKeepVtt,
+        ccCount: 0,
     };
 
-    const emptyLine: LineMeaning = { type: LineType.empty, lineMulti: '' };
+    const counterlessGroups = lineGroups.map(removeEmptyAndCounter).filter(Boolean);
 
     const newGroups = counterlessGroups.map(
         ([stampLine, textLine], idx) => {
@@ -29,17 +27,19 @@ export function processWithGroups({ groups, doSrt }: { groups: LinesGroup[], doS
         newGroups.unshift([{ type: LineType.text, lineMulti: 'WEBVTT' }, emptyLine]);
     }
 
-    printLineMeaningsGroups(newGroups);
+    printLineGroups(newGroups);
 
     return newGroups;
 }
 
-function removeEmptyAndCounter(group: LinesGroup): [stamp: LineMeaning, text: LineMeaning] | undefined {
+const emptyLine: LineCnt = { type: LineType.empty, lineMulti: '' };
+
+function removeEmptyAndCounter(group: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
 
     type GroupItem = {
-        stamp?: LineMeaning;
-        text?: LineMeaning;
+        stamp?: LineCnt;
+        text?: LineCnt;
     };
 
     const items = group.reduce<GroupItem>(
@@ -71,7 +71,7 @@ type Context = {
     action: ConvertAction;
 };
 
-function correctTimestamp(stamp: LineMeaning, context: Context) {
+function correctTimestamp(stamp: LineCnt, context: Context) {
     stamp.lineMulti = typeof stamp.lineMulti === 'string' ? fixLIne(stamp.lineMulti) : stamp.lineMulti.map(fixLIne);
 
     function fixLIne(line: string) {

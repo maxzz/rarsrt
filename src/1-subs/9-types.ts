@@ -10,9 +10,9 @@ export type SingleLineMeaning = {
     line: string;
 };
 
-export type LineMeaning = {
+export type LineCnt = { // Line meaning and content
     type: LineType;
     lineMulti: string | string[];
 };
 
-export type LinesGroup = LineMeaning[];
+export type LinesGroup = LineCnt[]; // Timestamp group in closed captions file is timestamp, text lines, and empty line.

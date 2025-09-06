@@ -1,11 +1,11 @@
 import { EOL } from "os";
-import { LineType, type LineMeaning, type LinesGroup, type SingleLineMeaning } from "./9-types";
+import { LineType, type LineCnt, type LinesGroup, type SingleLineMeaning } from "./9-types";
 
 // fix counter utilities
 
 const regFirstLine = new RegExp(`(WEBVTT\s*(FILE)?.*)(${EOL})*`, 'g');
 
-export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LinesGroup[] {
+export function splitToLineGroups(lines: SingleLineMeaning[]): LinesGroup[] {
     const rvGroups: LinesGroup[] = [];
 
     let idx = lines[0]?.line.match(regFirstLine) ? 1 : 0; // skip 'WEBVTT'
@@ -32,7 +32,7 @@ export function splitLineMeaningsToGroups(lines: SingleLineMeaning[]): LinesGrou
                 }
             }
 
-            let last: LineMeaning;
+            let last: LineCnt;
             while ((last = consecutive[consecutive.length - 1]) && last.type === LineType.empty) {
                 consecutive.pop();
             }
