@@ -36,28 +36,35 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         action: doSrt ? ConvertAction.convertToSrt : ConvertAction.fixAndKeepVtt,
     };
 
-    const emptyLine: LineMeaning = { type: LineType.empty, line: '' };
+    const emptyLine: LineMeaning = { type: LineType.empty, lineMulti: '' };
 
-    const newGroups = counterlessGroups.map(([stampLine, textLine], idx) => {
-        correctTimestamp(stampLine);
+    const newGroups = counterlessGroups.map(
+        ([stampLine, textLine], idx) => {
+            correctTimestamp(stampLine);
 
-        const newGroup: LineMeaning[] = [stampLine, textLine, emptyLine];
-        if (doSrt) {
-            newGroup.unshift({ type: LineType.counter, line: `${idx + 1}` });
+            const newGroup: LineMeaning[] = [stampLine, textLine, emptyLine];
+            if (doSrt) {
+                newGroup.unshift({ type: LineType.counter, lineMulti: `${idx + 1}` });
+            }
+            return newGroup;
         }
-        return newGroup;
-    });
+    );
 
     if (!doSrt) {
-        newGroups.unshift([{ type: LineType.text, line: 'WEBVTT' }, emptyLine]);
+        newGroups.unshift([{ type: LineType.text, lineMulti: 'WEBVTT' }, emptyLine]);
     }
 
-    //printLineMeaningsGroups(newGroups);
+    printLineMeaningsGroups(newGroups);
 
     return newGroups;
 
     function correctTimestamp(stamp: SingleLineMeaning) {
-        stamp.line = stamp.line.split('-->').map((leftAndRight) => convertTimestamp(leftAndRight, context)).join(' --> ');
+        stamp.line = stamp.line
+            .split('-->')
+            .map(
+                (leftAndRight) => convertTimestamp(leftAndRight, context)
+            )
+            .join(' --> ');
     }
 
     function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
@@ -68,14 +75,19 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
             text?: SingleLineMeaning;
         };
 
-        const items = group.reduce<GroupItem>((acc, cur) => {
-            (cur.type === LineType.stamp) && (acc.stamp = cur);
-            (cur.type === LineType.text) && (acc.text = cur);
-            return acc;
-        }, {});
+        const items = group.reduce<GroupItem>(
+            (acc, cur) => {
+                (cur.type === LineType.stamp) && (acc.stamp = cur);
+                (cur.type === LineType.text) && (acc.text = cur);
+                return acc;
+            }, {}
+        );
 
         if (items.stamp && items.text) {
-            return [items.stamp, items.text];
+            return [
+                items.stamp,
+                items.text,
+            ];
         }
 
         console.log(chalk.red('Empty group:', JSON.stringify(group)));
