@@ -1,4 +1,4 @@
-import { newErrorArgs } from "../../utils/utils-errors";
+import { newErrorArgs } from "../utils";
 
 export function handleFiles(filesToRar: string[]): void {
     // TOOO: Check: all files and folders should be inside the same folder (although it isn't possible with drag&drop).

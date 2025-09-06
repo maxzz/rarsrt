@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 
 const APP_NAME = "rarsrt"; //let cfg = require('../../package.json');
-const APP_VERSION = "1.2.4";
+const APP_VERSION = "1.25.1";
 
 export function help() {
     let txt = `

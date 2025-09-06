@@ -1,30 +1,23 @@
 import path from 'path';
 import chalk from 'chalk';
-import { exitProcess, newErrorArgs } from './utils/utils-errors';
-import { Targets } from './app/app-types';
-import { getTargets } from './app/app-arguments';
-import { help } from './app/app-help';
-import { notes } from './app/app-notes';
-import { ffmpegUtils } from './utils/utils-ffmpeg';
-import { handleFolders } from './app/app';
-import { handleFiles } from './app/process';
+import { exitProcess } from './utils/7-utils-errors';
+import { Targets } from './5-args/9-types-args';
+import { getTargets } from './5-args/1-app-arguments';
+import { ffmpegUtils } from './utils/3-utils-ffmpeg';
+import { notes } from './utils';
+import { help } from './utils/2-app-help';
+import { processArgs } from './0-all-app/0-all';
 
 async function main() {
     ffmpegUtils.findFFMpeg();
 
     const targets: Targets = getTargets();
 
-    if (targets.files.length) {
-        handleFiles([...targets.files, ...targets.dirs]);
-    } else if (targets.dirs.length) {
-        handleFolders(targets.dirs);
-    } else {
-        throw newErrorArgs(`Specify at leats one folder or files name to process`);
-    }
+    await processArgs(targets);
 
     if (notes.willShow()) {
         if (targets.dirs.length) {
-            let rootDir = path.dirname(targets.dirs[0]);
+            const rootDir = path.dirname(targets.dirs[0]);
             console.log(chalk.blueBright(`Processed root:\n${rootDir}`));
         }
         //TODO: else [...targets.files, ...targets.dirs]

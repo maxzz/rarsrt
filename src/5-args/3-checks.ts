@@ -1,11 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { exist, replaceExt } from '../../utils/utils-os';
-import { msgFnameTooLong, printFilenameLength } from "../app-messages";
-import { notes } from "../app-notes";
-import { AppOptions } from "../app-types";
-import { MSPair } from "./matched-pairs";
-import { ConvertResult, convertSubtitles } from "./subs";
+import { exist, notes, replaceExt } from '../utils';
+import { msgFnameTooLong, printFilenameLength } from "./2-app-messages";
+import { type AppOptions } from "./9-types-args";
+import { type MSPair } from "./4-matched-pairs";
+import { ConvertResult, convertSubtitles } from "../1-subs";
 
 export function checkFilenameMaxLen(targetFolder: string, srt: string, final: MSPair[]) {
     if (srt.length > 248) {

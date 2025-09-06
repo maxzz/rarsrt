@@ -1,7 +1,7 @@
 import path from 'path';
 import chalk from "chalk";
-import { removeIndent } from "../utils/utils-es6";
-import { MSPair } from "./process";
+import { removeIndent } from "../utils";
+import { type MSPair } from "./4-matched-pairs";
 
 export function printFilenameLength(targetFolder: string, final: MSPair[]): void {
     let oneLong = final.filter((pair) => targetFolder.length + pair.srt.length > 248).length === 1;
@@ -35,22 +35,4 @@ export function msgFnameTooLong(fname: string): string {
         ${chalk.yellow(`Rename the file so that the file name is ${fname.length - 248} character${fname.length - 255 === 1 ? '' : 's'} shorter.`)}`
     ).replace(/^\r?\n/, '');
     return ss;
-}
-
-export class LineAnimation {
-    animIndex = 0;
-    animations = [".  ", ".. ", "...", " ..", "  .", "   ",];
-    lastMsgLenght = this.animations.length;
-
-    writeStateLine(msg?: string) {
-        this.cleanStateLine();
-        const s = ` ${this.animations[++this.animIndex % this.animations.length]} ${msg || ''} \r`;
-        this.lastMsgLenght = s.length;
-        process.stdout.write(s);
-    }
-
-    cleanStateLine() {
-        process.stdout.write(`${' '.repeat(this.lastMsgLenght)}\r`);
-        this.lastMsgLenght = 0;
-    }
 }

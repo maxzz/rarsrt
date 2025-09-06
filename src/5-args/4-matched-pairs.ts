@@ -1,6 +1,5 @@
 import path from 'path';
-import { fnames } from "../../utils/utils-os";
-import { OsStuff } from "../../utils/utils-os-stuff";
+import { fnames, OsStuff } from "../utils";
 
 export type MSPair = {  // mp4 and srt pair
     mp4: string;        // short filename.mp4

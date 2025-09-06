@@ -1,31 +1,12 @@
 import path from 'path';
-import { exist } from '../utils/utils-os';
-import { newErrorArgs } from '../utils/utils-errors';
-import { AppOptions, Targets } from './app-types';
-import { OsStuff } from '../utils/utils-os-stuff';
+import { exist, newErrorArgs, OsStuff } from '../utils';
+import { type AppOptions, type Targets } from './9-types-args';
 
-function checkArg(argTargets: string[]): Targets {
-    let rv: Targets = {
-        files: [],
-        dirs: [],
-    };
-
-    for (let target of argTargets) {
-        let current: string = path.resolve(target); // relative to the start up folder
-        let st = exist(current);
-        if (st) {
-            if (st.isDirectory()) {
-                rv.dirs.push(current);
-            } else if (st.isFile()) {
-                rv.files.push(current); // TODO: Check all files should have the same root folder. That is not possible with drag and drop, but still ...
-            }
-        } else {
-            throw newErrorArgs(`Target "${target}" does not exist.`);
-        }
-    }
-
-    return rv;
+export function getAppOptions(): AppOptions {
+    return appOptions;
 }
+
+let appOptions = {} as AppOptions;
 
 export function getTargets(): Targets {
     // console.log('args', JSON.stringify(process.argv.slice(2), null, 4));
@@ -61,8 +42,25 @@ export function getTargets(): Targets {
     return targets;
 }
 
-let appOptions = {} as AppOptions;
+function checkArg(argTargets: string[]): Targets {
+    let rv: Targets = {
+        files: [],
+        dirs: [],
+    };
 
-export function getAppOptions(): AppOptions {
-    return appOptions;
+    for (let target of argTargets) {
+        let current: string = path.resolve(target); // relative to the start up folder
+        let st = exist(current);
+        if (st) {
+            if (st.isDirectory()) {
+                rv.dirs.push(current);
+            } else if (st.isFile()) {
+                rv.files.push(current); // TODO: Check all files should have the same root folder. That is not possible with drag and drop, but still ...
+            }
+        } else {
+            throw newErrorArgs(`Target "${target}" does not exist.`);
+        }
+    }
+
+    return rv;
 }
