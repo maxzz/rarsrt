@@ -32,6 +32,7 @@
         "@types/minimist": "^1.2.2",
         "@types/node": "18.15.5",
         "@types/rimraf": "3.0.2",
+        "pkg": "^5.8.1",
         "tsup": "^8.5.0",
         "tsx": "^4.20.5",
         "typescript": "^5.9.2"
@@ -43,8 +44,10 @@
     },
     "scripts": {
         "dev": "tsc -w",
-        "build": "rm -rf dist && tsc",
-        "_prepublish": "yarn build",
-        "_makebin": "yarn build && pkg -t host -o mergesubs dist/index.js"
+        "build1": "tsup src/index.ts --format cjs --clean",
+        "build": "tsup src/index.ts --format cjs --clean && pkg -t node18-win-x64 -o mergesubs dist/index.js",
+        "_build": "rm -rf dist && tsc",
+        "_prepublish": "pnpm build",
+        "_makebin": "pnpm build && pkg -t node18-win-x64 -o mergesubs dist/index.js"
     }
 }
