@@ -14,3 +14,5 @@ export type LineMeaning = {
     type: LineType;
     lineMulti: string | string[];
 };
+
+export type LinesGroup = LineMeaning[];

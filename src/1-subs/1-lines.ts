@@ -1,12 +1,8 @@
 import chalk from "chalk";
-import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
-import { getLinesMeaning } from "./6-get-lines-meaning";
-import { splitLineMeaningsToGroups } from "./7-split-line-meaning-to-groups";
+import { type LinesGroup, type LineMeaning, LineType } from "./9-types";
 import { printLineMeaningsGroups } from "./8-print-line-groups";
 
-export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], doSrt: boolean; }): LineMeaning[][] {
-    const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
-    const groups: LineMeaning[][] = splitLineMeaningsToGroups(linesMeaning);
+export function processWithGroups({ groups, doSrt }: { groups: LinesGroup[], doSrt: boolean; }): LinesGroup[] {
     const counterlessGroups = groups.map(removeEmptyAndCounter).filter(Boolean);
 
     const context: Context = {
@@ -21,7 +17,7 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
         ([stampLine, textLine], idx) => {
             correctTimestamp(stampLine, context);
 
-            const newGroup: LineMeaning[] = [stampLine, textLine, emptyLine];
+            const newGroup: LinesGroup = [stampLine, textLine, emptyLine];
             if (doSrt) {
                 newGroup.unshift({ type: LineType.counter, lineMulti: `${idx + 1}` });
             }
@@ -38,7 +34,7 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
     return newGroups;
 }
 
-function removeEmptyAndCounter(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeaning] | undefined {
+function removeEmptyAndCounter(group: LinesGroup): [stamp: LineMeaning, text: LineMeaning] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
 
     type GroupItem = {

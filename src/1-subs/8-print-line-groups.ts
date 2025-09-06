@@ -1,14 +1,14 @@
 import chalk from "chalk";
 import { EOL } from "os";
-import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
+import { LineType, type LinesGroup } from "./9-types";
 
-export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {
+export function printLineMeaningsGroups(lineMeaning: LinesGroup[]) {
     lineMeaning.forEach((group) => {
         console.log(chalk.green('start:'));
         printLineMeanings(group);
     });
 
-    function printLineMeanings(lineMeaning: LineMeaning[]) {
+    function printLineMeanings(lineMeaning: LinesGroup) {
         lineMeaning.forEach(({ lineMulti: line, type }) => {
             const prefix =
                 type === LineType.counter
