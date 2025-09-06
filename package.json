@@ -28,20 +28,20 @@
     "bugs": {
         "url": "https://github.com/maxzz/rarsrt/issues"
     },
-    "scripts": {
-        "dev": "tsc -w",
-        "build": "rm -rf dist && tsc",
-        "prepublish": "yarn build",
-        "makebin": "yarn build && pkg -t host -o mergesubs dist/index.js"
+    "devDependencies": {
+        "@types/minimist": "^1.2.2",
+        "@types/node": "18.15.5",
+        "@types/rimraf": "3.0.2"
     },
     "dependencies": {
         "chalk": "^4.1.0",
         "minimist": "1.2.8",
         "rimraf": "^3.0.2"
     },
-    "devDependencies": {
-        "@types/minimist": "^1.2.2",
-        "@types/node": "18.15.5",
-        "@types/rimraf": "3.0.2"
+    "scripts": {
+        "dev": "tsc -w",
+        "build": "rm -rf dist && tsc",
+        "_prepublish": "yarn build",
+        "_makebin": "yarn build && pkg -t host -o mergesubs dist/index.js"
     }
 }
