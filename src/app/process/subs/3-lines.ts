@@ -61,21 +61,25 @@ export function processWithGroups({ fileLines, doSrt }: { fileLines: string[], d
 
     return newGroups;
 
-    function correctTimestamp(stamp: SingleLineMeaning) {
-        stamp.line = stamp.line
-            .split('-->')
-            .map(
-                (leftAndRight) => convertTimestamp(leftAndRight, context)
-            )
-            .join(' --> ');
+    function correctTimestamp(stamp: LineMeaning) {
+        stamp.lineMulti = typeof stamp.lineMulti === 'string' ? fixLIne(stamp.lineMulti) : stamp.lineMulti.map(fixLIne);
+
+        function fixLIne(line: string) {
+            return line.split('-->')
+                .map(
+                    (leftAndRight) => convertTimestamp(leftAndRight, context)
+                )
+                .join(' --> ');
+        }
+
     }
 
-    function removeEmptyAndCounter(group: SingleLineMeaning[]): [stamp: SingleLineMeaning, text: SingleLineMeaning] | undefined {
+    function removeEmptyAndCounter(group: LineMeaning[]): [stamp: LineMeaning, text: LineMeaning] | undefined {
         // 0. remove the previous counter(s) and remove any empty lines
 
         type GroupItem = {
-            stamp?: SingleLineMeaning;
-            text?: SingleLineMeaning;
+            stamp?: LineMeaning;
+            text?: LineMeaning;
         };
 
         const items = group.reduce<GroupItem>(
