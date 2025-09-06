@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 
 const APP_NAME = "rarsrt"; //let cfg = require('../../package.json');
 const APP_VERSION = "1.25.1";

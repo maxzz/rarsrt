@@ -1,6 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { exist, notes, replaceExt } from '../utils';
+import fs from "fs";
+import path from "path";
+import { exist, notes, replaceExt } from "../utils";
 import { msgFnameTooLong, printFilenameLength } from "./2-app-messages";
 import { type AppOptions } from "./9-types-args";
 import { type MSPair } from "./4-matched-pairs";

@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
-import chalk from 'chalk';
-import { removeIndent } from './7-utils-es6';
-import { notes } from './2-app-notes';
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
+import chalk from "chalk";
+import { removeIndent } from "./7-utils-es6";
+import { notes } from "./2-app-notes";
 
 export namespace ffmpegUtils {
     let FFMPEG: string;

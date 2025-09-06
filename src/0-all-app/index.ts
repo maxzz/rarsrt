@@ -1,1 +1,1 @@
-export * from './1-handle-folders';
+export * from "./0-all";

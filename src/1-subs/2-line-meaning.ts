@@ -1,4 +1,4 @@
-import { EOL } from 'os';
+import { EOL } from "os";
 import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
 
 // fix counter utilities

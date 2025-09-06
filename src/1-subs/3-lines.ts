@@ -1,7 +1,7 @@
-import chalk from 'chalk';
+import chalk from "chalk";
 import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
-import { getLinesMeaning } from './1-split-lines';
-import { printLineMeaningsGroups } from './8-print-line-groups';
+import { getLinesMeaning } from "./1-split-lines";
+import { printLineMeaningsGroups } from "./8-print-line-groups";
 import { splitLineMeaningsToGroups } from "./2-line-meaning";
 
 const enum ConvertAction {

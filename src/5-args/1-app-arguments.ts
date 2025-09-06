@@ -1,6 +1,6 @@
-import path from 'path';
-import { exist, newErrorArgs, OsStuff } from '../utils';
-import { type AppOptions, type Targets } from './9-types-args';
+import path from "path";
+import { exist, newErrorArgs, OsStuff } from "../utils";
+import { type AppOptions, type Targets } from "./9-types-args";
 
 export function getAppOptions(): AppOptions {
     return appOptions;

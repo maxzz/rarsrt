@@ -1,5 +1,5 @@
-import { combineLineMeaningGroups } from './2-line-meaning';
-import { processWithGroups } from './3-lines';
+import { combineLineMeaningGroups } from "./2-line-meaning";
+import { processWithGroups } from "./3-lines";
 
 export type ConvertResult = {
     newContent: string;

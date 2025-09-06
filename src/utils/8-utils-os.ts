@@ -1,5 +1,5 @@
-import path from 'path';
-import fs from 'fs';
+import path from "path";
+import fs from "fs";
 
 export function exist(name: string): fs.Stats | undefined {
     try {

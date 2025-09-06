@@ -1,9 +1,9 @@
-import path from 'path';
-import fs from 'fs';
-import rimraf from 'rimraf';
-import { ffmpegUtils, LineAnimation, notes } from '../utils';
-import { checkFilenameMaxLen, getAppOptions, preprocessSubtitlesFileFormat } from '../5-args';
-import { type MSPair, getMSPairs } from '../5-args';
+import path from "path";
+import fs from "fs";
+import rimraf from "rimraf";
+import { ffmpegUtils, LineAnimation, notes } from "../utils";
+import { checkFilenameMaxLen, getAppOptions, preprocessSubtitlesFileFormat } from "../5-args";
+import { type MSPair, getMSPairs } from "../5-args";
 
 export function handleFolders(dirs: string[]) {
     for (let dir of dirs) {

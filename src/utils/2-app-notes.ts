@@ -1,5 +1,5 @@
-import chalk from 'chalk';
-import { exitProcess } from './7-utils-errors';
+import chalk from "chalk";
+import { exitProcess } from "./7-utils-errors";
 
 export namespace notes {
 
@@ -37,5 +37,5 @@ export namespace notes {
             await exitProcess(0, final);
         }
     }
-    
+
 }

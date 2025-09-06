@@ -1,5 +1,5 @@
-import chalk from 'chalk';
-import { EOL } from 'os';
+import chalk from "chalk";
+import { EOL } from "os";
 import { LineType, type LineMeaning, type SingleLineMeaning } from "./9-types";
 
 export function printLineMeaningsGroups(lineMeaning: LineMeaning[][]) {

@@ -1,12 +1,9 @@
-import path from 'path';
-import chalk from 'chalk';
-import { exitProcess } from './utils/7-utils-errors';
-import { Targets } from './5-args/9-types-args';
-import { getTargets } from './5-args/1-app-arguments';
-import { ffmpegUtils } from './utils/3-utils-ffmpeg';
-import { notes } from './utils';
-import { help } from './utils/2-app-help';
-import { processArgs } from './0-all-app/0-all';
+import path from "path";
+import chalk from "chalk";
+import { ffmpegUtils, help, notes } from "./utils";
+import { type Targets, getTargets } from "./5-args";
+import { exitProcess } from "./utils/7-utils-errors";
+import { processArgs } from "./0-all-app";
 
 async function main() {
     ffmpegUtils.findFFMpeg();
