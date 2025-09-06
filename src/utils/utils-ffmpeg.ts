@@ -6,7 +6,6 @@ import { removeIndent } from './utils-es6';
 import { notes } from '../app/app-notes';
 
 export namespace ffmpegUtils {
-
     let FFMPEG: string;
 
     export function findFFMpeg() {
@@ -17,7 +16,7 @@ export namespace ffmpegUtils {
         }
     }
 
-    function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error') : { stderr: string, cmderr: string, isMultilineSrt: boolean } | undefined {
+    function createFileMp4WithSrtNoThrou(fullNameMp4: string, fullNameSrt: string, fullNameOut: string, loglevel: string = 'error'): { stderr: string, cmderr: string, isMultilineSrt: boolean; } | undefined {
         // -y is to overwrite destination file.
         // -loglevel quiet is to reduce console output, but still will show errors. (alternatives: -nostats -hide_banner).
         // if file already has subtitles it will overwrite existing, i.e. not duplicate. actually it will skip the new one.
@@ -28,11 +27,11 @@ export namespace ffmpegUtils {
 
         let cmd = `"${FFMPEG}" -y -loglevel ${loglevel} -i "${fullNameMp4}" -i "${fullNameSrt}" -c copy -c:s mov_text -metadata:s:s:0 language=eng "${fullNameOut}"`;
         try {
-            execSync(cmd, {stdio: ['inherit', 'inherit', 'pipe']});
+            execSync(cmd, { stdio: ['inherit', 'inherit', 'pipe'] });
         } catch (error) {
             let isMultilineSrt = false;
 
-            const childError: string = error.stderr.toString();
+            const childError: string = (error as any).stderr?.toString();
             if (childError.match(/\.srt: Invalid data found when processing input/)) {
                 isMultilineSrt = true;
             }
@@ -55,10 +54,9 @@ export namespace ffmpegUtils {
         }
     }
 
-    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean } {
+    export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean; } {
         let error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut);
         if (error) {
-
             // Try to recover the bad srt file formatting.
             if (error.isMultilineSrt) {
                 let srtCnt = fs.readFileSync(fullNameSrt, 'utf8');
@@ -79,10 +77,12 @@ export namespace ffmpegUtils {
                 } else {
                     process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
                     error = createFileMp4WithSrtNoThrou(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');
-                    process.stdout.write(chalk.white('Error details:\n'));
-                    process.stdout.write(chalk.gray(error.stderr));
-                    console.log(chalk.white('------------------'));
-                    throw new Error(error.cmderr);
+                    if (error) {
+                        process.stdout.write(chalk.white('Error details:\n'));
+                        process.stdout.write(chalk.gray(error.stderr));
+                        console.log(chalk.white('------------------'));
+                        throw new Error(error.cmderr);
+                    }
                 }
             }
         }
