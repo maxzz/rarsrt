@@ -1,4 +1,4 @@
-import { LineType, type SingleLineCnt } from "./9-types";
+import { LineTypes, type SingleLineCnt } from "./9-types";
 
 export function getLinesMeaning(lines: string[]): SingleLineCnt[] {
     const linesMeaning = lines.map(getLineMeaning);
@@ -10,19 +10,19 @@ function getLineMeaning(line: string): SingleLineCnt {
     line = line.trim();
     const type =
         line === ''
-            ? LineType.empty
+            ? LineTypes.empty
             : line.match(regCcCounter)
-                ? LineType.counter
+                ? LineTypes.counter
                 : line.match(reg2ItemsLine) || line.match(reg3ItemsLine)
-                    ? LineType.stamp
+                    ? LineTypes.stamp
                     : line.match(extraMarkup)
-                        ? LineType.empty
-                        : LineType.text;
+                        ? LineTypes.empty
+                        : LineTypes.text;
     return { type, line };
 }
 
 function fixStartDotText(lineMeaning: SingleLineCnt) {
-    if (lineMeaning.type === LineType.text) {
+    if (lineMeaning.type === LineTypes.text) {
         const firstCh = lineMeaning.line?.charAt(0);
         const removeFirstCh = firstCh === '\u202B'; // || firstCh === '?' //right-to-left embedding (U+202B) //i.e. "‫.Both projects" -> "Both projects."
         removeFirstCh && (lineMeaning.line = lineMeaning.line.substring(1));

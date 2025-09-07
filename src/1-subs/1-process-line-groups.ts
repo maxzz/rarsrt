@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { type LinesGroup, type LineCnt, LineType } from "./9-types";
+import { type LinesGroup, type LineCnt, LineTypes } from "./9-types";
 import { printLineGroups } from "./8-print-line-groups";
 
 export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGroup[], doSrt: boolean; }): LinesGroup[] {
@@ -17,14 +17,14 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
 
             const newGroup: LinesGroup = [stampLine, textLine, emptyLine];
             if (doSrt) {
-                newGroup.unshift({ type: LineType.counter, lineMulti: `${idx + 1}` });
+                newGroup.unshift({ type: LineTypes.counter, lineMulti: `${idx + 1}` });
             }
             return newGroup;
         }
     );
 
     if (!doSrt) {
-        newGroups.unshift([{ type: LineType.text, lineMulti: 'WEBVTT' }, emptyLine]);
+        newGroups.unshift([{ type: LineTypes.text, lineMulti: 'WEBVTT' }, emptyLine]);
     }
 
     printLineGroups(newGroups);
@@ -32,7 +32,7 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
     return newGroups;
 }
 
-const emptyLine: LineCnt = { type: LineType.empty, lineMulti: '' };
+const emptyLine: LineCnt = { type: LineTypes.empty, lineMulti: '' };
 
 function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
@@ -44,8 +44,8 @@ function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: L
 
     const items = linesGroup.reduce<GroupItem>(
         (acc, cur) => {
-            (cur.type === LineType.stamp) && (acc.stamp = cur);
-            (cur.type === LineType.text) && (acc.text = cur);
+            (cur.type === LineTypes.stamp) && (acc.stamp = cur);
+            (cur.type === LineTypes.text) && (acc.text = cur);
             return acc;
         }, {}
     );

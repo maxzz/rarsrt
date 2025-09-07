@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { EOL } from "os";
-import { type LinesGroup, LineType } from "./9-types";
+import { type LinesGroup, LineTypes } from "./9-types";
 
 export function printLineGroups(lineGroups: LinesGroup[]) {
     lineGroups.forEach(
@@ -15,13 +15,13 @@ function printLineMeanings(lineGroup: LinesGroup) {
     lineGroup.forEach(
         ({ lineMulti: line, type }) => {
             const prefix =
-                type === LineType.counter
+                type === LineTypes.counter
                     ? chalk.cyan('numbr')
-                    : type === LineType.stamp
+                    : type === LineTypes.stamp
                         ? chalk.yellow('stamp')
-                        : type === LineType.empty
+                        : type === LineTypes.empty
                             ? '     '
-                            : type === LineType.text
+                            : type === LineTypes.text
                                 ? chalk.gray(' text')
                                 : chalk.red('?');
 

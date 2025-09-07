@@ -6,7 +6,7 @@ import { exitProcess } from "./utils/7-utils-errors";
 import { processArgs } from "./0-all-app";
 
 async function main() {
-    ffmpegUtils.findFFMpeg();
+    ffmpegUtils.whereFFMpeg();
 
     const targets: Targets = getTargets();
 

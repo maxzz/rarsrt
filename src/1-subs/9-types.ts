@@ -1,9 +1,11 @@
-export const enum LineType {
-    counter,
-    stamp,
-    empty,      // empty line
-    text,       // anything else
-}
+export const LineTypes = {
+    counter: '#',    // line counter
+    stamp: 't',      // timestamp
+    empty: 'e',      // empty line
+    text: 'l',       // anything else as line of text
+} as const;
+
+export type LineType = typeof LineTypes[keyof typeof LineTypes];
 
 export type SingleLineCnt = { // Line meaning of single line content
     type: LineType;
