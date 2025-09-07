@@ -28,23 +28,20 @@ export function preprocessSubtitlesFileFormat(fullFname: string, options: AppOpt
 
     const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
     let newCnt: ConvertSubtitlesResult = convertSubtitles({ fileContent: cnt, doSrt });
-    saveIfNeed(fullFname, newCnt);
 
-    function saveIfNeed(fullFname: string, newCnt: ConvertSubtitlesResult) {
-        if (newCnt.hasFixes) {
-            createBackup(fullFname);
-            fs.writeFileSync(fullFname, newCnt.newContent);
-        }
+    if (newCnt.hasFixes) { // save if need
+        createBackup(fullFname, options);
+        fs.writeFileSync(fullFname, newCnt.newContent);
     }
+}
 
-    function createBackup(fname: string) {
-        if (!options.keepOrg) {
-            return;
-        }
-        const backupName = replaceExt(fname, '.___'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
-        if (!exist(backupName)) {
-            const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-            fs.writeFileSync(backupName, cnt);
-        }
+function createBackup(fname: string, options: AppOptions) {
+    if (!options.keepOrg) {
+        return;
+    }
+    const backupName = replaceExt(fname, '.___backup-cc'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
+    if (!exist(backupName)) {
+        const cnt = fs.readFileSync(fname, { encoding: 'utf-8' });
+        fs.writeFileSync(backupName, cnt);
     }
 }
