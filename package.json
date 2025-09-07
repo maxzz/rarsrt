@@ -44,6 +44,7 @@
     },
     "scripts": {
         "tsc": "tsc -w",
+        "test": "tsx src/index.ts --preserve --keeporg C:/Users/maxzz/Desktop/03.20.23",
         "build": "tsup src/index.ts --format cjs --clean && pkg -t node18-win-x64 -o mergesubs dist/index.js",
         "prepublish": "npm run build"
     }
