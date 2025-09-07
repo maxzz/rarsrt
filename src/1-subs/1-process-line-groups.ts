@@ -39,7 +39,7 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
         newGroups.unshift([{ type: LineTypes.text, lineMulti: 'WEBVTT' }, emptyLine]);
     }
 
-    printLineGroups(newGroups);
+    //printLineGroups(newGroups);
 
     return newGroups;
 }
@@ -47,20 +47,39 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
 const emptyLine: LineCnt = { type: LineTypes.empty, lineMulti: '' };
 
 /**
- * @param linesGroup
+ * @param linesGroup - Group of lines with line numbers.
  * ```
  * [
  *    {type: '#', line: '1'},
  *    {type: 't', line: '00:00:00,180 --> 00:00:00,510'},
  *    {type: 'l', line: 'Okay.'}
  * ]
- * @returns
  * ```
- [
-    {type: 't', lineMulti: '00:00:00,180 --> 00:00:00,510'},
-    {type: 'l', lineMulti: 'Okay.'}
- ]
- ```
+ * @returns - Group of lines without line numbers.
+ * ```
+ *    [
+ *       {type: 't', lineMulti: '00:00:00,180 --> 00:00:00,510'},
+ *       {type: 'l', lineMulti: 'Okay.'}
+ *    ]
+ * 
+ *     //This is to fight with:
+ *      0
+ *      1
+ *      00:00:01,280 --> 00:00:08,450
+ *      Hello and welcome
+ *      1
+ *      2
+ *      00:00:08,450 --> 00:00:16,640
+ *      go before nouns and show
+ *      
+ *      //And fix as:
+ *      1
+ *      00:00:01,280  -->  00:00:08,450
+ *      Hello and welcome
+ *      2
+ *      00:00:08,450  -->  00:00:16,640
+ *      go before nouns and show
+ * ```
  */
 function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
