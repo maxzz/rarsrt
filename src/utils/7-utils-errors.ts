@@ -24,6 +24,10 @@ interface ErrorArgs extends Error {
     args: boolean;
 }
 
+export function isErrorArgs(error: unknown): error is ErrorArgs {
+    return 'args' in (error as any);
+}
+
 export function newErrorArgs(msg: string): ErrorArgs {
     let error = new Error(msg) as ErrorArgs;
     error.args = true;

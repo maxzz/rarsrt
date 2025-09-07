@@ -3,7 +3,7 @@ import path from "path";
 import { execSync } from "child_process";
 import chalk from "chalk";
 import { removeIndent } from "./7-utils-es6";
-import { notes } from "./2-app-notes";
+import { Notes } from "./2-app-notes";
 
 export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, fullNameOut: string): { skipped: boolean; } {
     let error = execFfmpeg(fullNameMp4, fullNameSrt, fullNameOut);
@@ -24,7 +24,7 @@ export function createFileMp4WithSrt(fullNameMp4: string, fullNameSrt: string, f
                     chalk.gray(`  Folder:\n  ${path.dirname(fullNameSrt)}`),
                     chalk.gray(`  File:\n  ${path.basename(fullNameSrt)}`),
                 ].join('\n');
-                notes.add(msg);
+                Notes.add(msg);
             } else {
                 process.stdout.write(chalk.red(`         \rError (from ffmpeg):\n\n${error.stderr}\n`));
                 error = execFfmpeg(fullNameMp4, fullNameSrt, fullNameOut, 'verbose');

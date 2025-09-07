@@ -1,8 +1,7 @@
 import chalk from "chalk";
 import { exitProcess } from "./7-utils-errors";
 
-export namespace notes {
-
+export namespace Notes {
     let messages: string[] = []; // messages will be shown if any warnings happen.
     let processed: string[] = []; // processed will be shown if rarsrt processed more then one folder.
 
@@ -37,5 +36,4 @@ export namespace notes {
             await exitProcess(0, final);
         }
     }
-
 }

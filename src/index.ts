@@ -1,6 +1,6 @@
 import path from "path";
 import chalk from "chalk";
-import { ffmpegUtils, help, notes } from "./utils";
+import { ffmpegUtils, help, Notes } from "./utils";
 import { type Targets, getTargets } from "./5-args";
 import { exitProcess } from "./utils/7-utils-errors";
 import { processArgs } from "./0-all-app";
@@ -12,7 +12,7 @@ async function main() {
 
     await processArgs(targets);
 
-    if (notes.willShow()) {
+    if (Notes.willShow()) {
         if (targets.dirs.length) {
             const rootDir = path.dirname(targets.dirs[0]);
             console.log(chalk.blueBright(`Processed root:\n${rootDir}`));
@@ -20,12 +20,12 @@ async function main() {
         //TODO: else [...targets.files, ...targets.dirs]
     }
 
-    await notes.show(false);
+    await Notes.show(false);
 }
 
 main().catch(async (error) => {
     error.args && help(); // Show help only if arguments are invalid.
-    let errorMsg = `${notes.buildMessage()}${chalk[error.args ? 'yellow' : 'red'](`\n${error.message}`)}`;
+    let errorMsg = `${Notes.buildMessage()}${chalk[error.args ? 'yellow' : 'red'](`\n${error.message}`)}`;
     await exitProcess(1, errorMsg);
 });
 

@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
 import rimraf from "rimraf";
-import { exist, ffmpegUtils, LineAnimation, notes, replaceExt } from "../utils";
-import { type AppOptions, type MSPair, getAppOptions, getMSPairs } from "../5-args";
+import { exist, ffmpegUtils, LineAnimation, Notes, replaceExt } from "../utils";
 import { checkFilenameMaxLen } from "./3-check-filename-max-length";
+import { type AppOptions, type MSPair, getAppOptions, getMSPairs } from "../5-args";
 import { type ConvertSubtitlesResult, convertSubtitles } from "../1-subs";
 
 export function handleFolders(dirs: string[]) {
@@ -27,7 +27,7 @@ function handleFolder(targetFolder: string): void {
 
     animation.clear();
 
-    notes.addProcessed(`    ${allPairs.length ? ` (${allPairs.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
+    Notes.addProcessed(`    ${allPairs.length ? ` (${allPairs.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
 
 function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[], animation: LineAnimation): void {
