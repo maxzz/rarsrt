@@ -1,8 +1,8 @@
 import { EOL } from "os";
-import { type SingleLineMeaning, type LinesGroup } from "./9-types";
+import { type SingleLineCnt, type LinesGroup } from "./9-types";
 import { processLineGroups } from "./1-process-line-groups";
 import { getLinesMeaning } from "./6-get-lines-meaning";
-import { splitToLineGroups } from "./7-split-to-line-groups";
+import { makeLineGroups } from "./7-make-line-groups";
 
 type ConvertSubtitlesParams = {
     fileContent: string;    // The file content to be processed.
@@ -16,12 +16,11 @@ export type ConvertSubtitlesResult = {
 
 export function convertSubtitles({ fileContent, doSrt }: ConvertSubtitlesParams): ConvertSubtitlesResult {
     const fileLines = fileContent.split(/\r?\n/);
-    const linesMeaning: SingleLineMeaning[] = getLinesMeaning(fileLines);
-    const lineGroups: LinesGroup[] = splitToLineGroups(linesMeaning);
+    const singleLineCnts: SingleLineCnt[] = getLinesMeaning(fileLines);
+    const lineGroups: LinesGroup[] = makeLineGroups(singleLineCnts);
 
     const newGroups = processLineGroups({ lineGroups, doSrt });
-
-    const newContent = combineLineMeaningGroups(newGroups);
+    const newContent = combineLineGroups(newGroups);
 
     return {
         newContent,
@@ -29,12 +28,15 @@ export function convertSubtitles({ fileContent, doSrt }: ConvertSubtitlesParams)
     };
 }
 
-function combineLineMeaningGroups(lineMeaning: LinesGroup[]) {
-    const newContent = lineMeaning.map(
-        (group) => group.map(
-            ({ lineMulti: line }) => typeof line === 'string' ? line : line.join(EOL)
-        ).join(EOL)
-    ).join(EOL);
+function combineLineGroups(linesGroups: LinesGroup[]) {
+    const newContent =
+        linesGroups
+            .map(
+                (linesGroup) => linesGroup.map(
+                    ({ lineMulti }) => typeof lineMulti === 'string' ? lineMulti : lineMulti.join(EOL)
+                ).join(EOL)
+            )
+            .join(EOL);
 
     return newContent;
 }

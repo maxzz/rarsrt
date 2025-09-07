@@ -34,7 +34,7 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
 
 const emptyLine: LineCnt = { type: LineType.empty, lineMulti: '' };
 
-function removeEmptyAndCounter(group: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
+function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
 
     type GroupItem = {
@@ -42,7 +42,7 @@ function removeEmptyAndCounter(group: LinesGroup): [stamp: LineCnt, text: LineCn
         text?: LineCnt;
     };
 
-    const items = group.reduce<GroupItem>(
+    const items = linesGroup.reduce<GroupItem>(
         (acc, cur) => {
             (cur.type === LineType.stamp) && (acc.stamp = cur);
             (cur.type === LineType.text) && (acc.text = cur);
@@ -57,7 +57,7 @@ function removeEmptyAndCounter(group: LinesGroup): [stamp: LineCnt, text: LineCn
         ];
     }
 
-    console.log(chalk.red('Empty group:', JSON.stringify(group)));
+    console.log(chalk.red('Empty group:', JSON.stringify(linesGroup)));
 }
 
 const enum ConvertAction {

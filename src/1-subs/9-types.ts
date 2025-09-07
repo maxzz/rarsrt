@@ -5,12 +5,12 @@ export const enum LineType {
     text,       // anything else
 }
 
-export type SingleLineMeaning = {
+export type SingleLineCnt = { // Line meaning of single line content
     type: LineType;
     line: string;
 };
 
-export type LineCnt = { // Line meaning and content
+export type LineCnt = { // Line meaning and multi line content
     type: LineType;
     lineMulti: string | string[];
 };

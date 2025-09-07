@@ -1,12 +1,12 @@
-import { LineType, type SingleLineMeaning } from "./9-types";
+import { LineType, type SingleLineCnt } from "./9-types";
 
-export function getLinesMeaning(lines: string[]): SingleLineMeaning[] {
+export function getLinesMeaning(lines: string[]): SingleLineCnt[] {
     const linesMeaning = lines.map(getLineMeaning);
-    fixStartDotTextLinesInPlace(linesMeaning);
+    linesMeaning.forEach(fixStartDotText); //TODO: this can be controlled by CLI, butit's OK for now.
     return linesMeaning;
 }
 
-function getLineMeaning(line: string): SingleLineMeaning {
+function getLineMeaning(line: string): SingleLineCnt {
     line = line.trim();
     const type =
         line === ''
@@ -21,15 +21,12 @@ function getLineMeaning(line: string): SingleLineMeaning {
     return { type, line };
 }
 
-function fixStartDotTextLinesInPlace(lineMeaning: SingleLineMeaning[]) {
-    function fix(lineMeaning: SingleLineMeaning) {
-        if (lineMeaning.type === LineType.text) {
-            const first = lineMeaning.line?.charAt(0);
-            const removeFirst = first === '\u202B'; // || first === '?' //right-to-left embedding (U+202B) //i.e. "‫.Both projects" -> "Both projects."
-            removeFirst && (lineMeaning.line = lineMeaning.line.substring(1));
-        }
+function fixStartDotText(lineMeaning: SingleLineCnt) {
+    if (lineMeaning.type === LineType.text) {
+        const firstCh = lineMeaning.line?.charAt(0);
+        const removeFirstCh = firstCh === '\u202B'; // || firstCh === '?' //right-to-left embedding (U+202B) //i.e. "‫.Both projects" -> "Both projects."
+        removeFirstCh && (lineMeaning.line = lineMeaning.line.substring(1));
     }
-    lineMeaning.forEach(fix); //TODO: this can be controlled by CLI, butit's OK for now.
 }
 
 const extraMarkup = /^Kind:|^Language:/;

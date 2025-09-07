@@ -11,22 +11,25 @@ export function handleFolders(dirs: string[]) {
     }
 }
 
-function handleFolder(targetFolder: string) {
+function handleFolder(targetFolder: string): void {
     // 0. Collect names with .mp4 and .srt combine them into pairs and merge.
     const animation = new LineAnimation();
     const lastFolder = path.basename(targetFolder) || targetFolder;
+    
     const allPairs: MSPair[] = getMSPairs(targetFolder);
 
-    allPairs.forEach(({ mp4, srt }) => {
-        oneFileAction(animation, targetFolder, mp4, srt, allPairs);
-    });
+    allPairs.forEach(
+        ({ mp4Fname, srtFname }) => {
+            oneFileAction(targetFolder, mp4Fname, srtFname, allPairs, animation);
+        }
+    );
 
-    animation.cleanStateLine();
+    animation.clear();
 
     notes.addProcessed(`    ${allPairs.length ? ` (${allPairs.length})`.padStart(7, ' ') : 'skipped'}: ${lastFolder}`);
 }
 
-function oneFileAction(animation: LineAnimation, targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[]) {
+function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string, final: MSPair[], animation: LineAnimation): void {
     const mp4FullFname = path.join(targetFolder, shortMp4);
     const srtFullFname = path.join(targetFolder, shortSrt);
     const outFullFname = path.join(targetFolder, `temp-tm-temp.mp4`);
@@ -36,8 +39,8 @@ function oneFileAction(animation: LineAnimation, targetFolder: string, shortMp4:
     checkFilenameMaxLen(targetFolder, srtFullFname, final);
     preprocessSubtitlesFileFormat(srtFullFname, appOptions);
 
-    animation.writeStateLine(shortMp4);
-    
+    animation.updateAnimation(shortMp4);
+
     const result = ffmpegUtils.createFileMp4WithSrt(mp4FullFname, srtFullFname, outFullFname); //TODO: try/catch to clean up 'temp-tm-temp.mp4' in case of exception
 
     if (!result.skipped) {

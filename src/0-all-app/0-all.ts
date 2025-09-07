@@ -1,7 +1,7 @@
 import { type Targets } from "../5-args";
 import { newErrorArgs } from "../utils";
-import { handleFolders } from "./1-handle-folders";
-import { handleFiles } from "./2-handle-files";
+import { handleFolders } from "./2-handle-folders";
+import { handleFiles } from "./1-handle-files";
 
 export async function processArgs(targets: Targets) {
     if (targets.files.length) {

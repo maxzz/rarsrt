@@ -1,9 +1,9 @@
 import path from "path";
 import { fnames, OsStuff } from "../utils";
 
-export type MSPair = {  // mp4 and srt pair
-    mp4: string;        // short filename.mp4
-    srt: string;        // short filename[(_en| English)](.srt|.vtt)
+export type MSPair = {       // mp4 and srt filenames pair
+    mp4Fname: string;        // short filename.mp4
+    srtFname: string;        // short filename[(_en| English)](.srt|.vtt)
 };
 
 export function getMSPairs(targetFolder: string): MSPair[] {
@@ -25,17 +25,17 @@ export function getMSPairs(targetFolder: string): MSPair[] {
 
             if (item.ext === fnames.ExtType.mp4) {
                 const current = (msPairs[base] || (msPairs[base] = {} as MSPair));
-                current.mp4 = item.short;
+                current.mp4Fname = item.short;
             }
             else if (item.ext === fnames.ExtType.srt || item.ext === fnames.ExtType.vtt) {
                 const clean = cleanUpSubName(base);
                 const current = (msPairs[clean] || (msPairs[clean] = {} as MSPair));
-                current.srt = item.short;
+                current.srtFname = item.short;
             }
         }
     ); //TODO: we can first iteration find all mp4 and then match base againts sub title filenames.
 
-    const completePairs: MSPair[] = (Object.values(msPairs)).filter((pair) => pair.mp4 && pair.srt);
+    const completePairs: MSPair[] = (Object.values(msPairs)).filter((pair) => pair.mp4Fname && pair.srtFname);
     return completePairs;
 
     function cleanUpSubName(name: string) {

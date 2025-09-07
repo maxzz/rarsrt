@@ -4,7 +4,7 @@ import { removeIndent } from "../utils";
 import { type MSPair } from "./4-matched-pairs";
 
 export function printFilenameLength(targetFolder: string, final: MSPair[]): void {
-    let oneLong = final.filter((pair) => targetFolder.length + pair.srt.length > 248).length === 1;
+    let oneLong = final.filter((pair) => targetFolder.length + pair.srtFname.length > 248).length === 1;
 
     let ss = removeIndent(`
         ${chalk.yellow(`The file name${oneLong ? '' : 's'} in the folder ${oneLong ? 'is' : 'are'} too long.`)}
@@ -20,10 +20,10 @@ export function printFilenameLength(targetFolder: string, final: MSPair[]): void
     console.log(ss);
 
     final.forEach((pair) => {
-        let s = path.join(targetFolder, `${pair.srt}`);
+        let s = path.join(targetFolder, `${pair.srtFname}`);
         let isLong = s.length > 248;
         let n = isLong ? `${s.length - 248}+248` : `${s.length}`;
-        console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srt}`);
+        console.log(`   ${chalk[isLong ? 'red' : 'white'](n.padStart(7, ' '))} | ${pair.srtFname}`);
     });
 }
 
