@@ -16,32 +16,3 @@ export function checkFilenameMaxLen(targetFolder: string, srt: string, final: MS
         throw Error(msgFnameTooLong(srt));
     }
 }
-
-export function preprocessSubtitlesFileFormat(fullFname: string, options: AppOptions): void {
-    const ext = path.extname(fullFname).toLowerCase();
-
-    if (ext !== '.vtt' && ext !== '.srt') {
-        return;
-    }
-
-    const doSrt = ext === '.srt';
-
-    const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
-    let newCnt: ConvertSubtitlesResult = convertSubtitles({ fileContent: cnt, doSrt });
-
-    if (newCnt.hasFixes) { // save if need
-        createBackup(fullFname, options);
-        fs.writeFileSync(fullFname, newCnt.newContent);
-    }
-}
-
-function createBackup(fname: string, options: AppOptions) {
-    if (!options.keepOrg) {
-        return;
-    }
-    const backupName = replaceExt(fname, '.___backup-cc'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
-    if (!exist(backupName)) {
-        const cnt = fs.readFileSync(fname, { encoding: 'utf-8' });
-        fs.writeFileSync(backupName, cnt);
-    }
-}

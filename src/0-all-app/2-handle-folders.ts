@@ -1,9 +1,10 @@
 import path from "path";
 import fs from "fs";
 import rimraf from "rimraf";
-import { ffmpegUtils, LineAnimation, notes } from "../utils";
-import { type MSPair, getAppOptions, getMSPairs } from "../5-args";
-import { checkFilenameMaxLen, preprocessSubtitlesFileFormat } from "./3-checks";
+import { exist, ffmpegUtils, LineAnimation, notes, replaceExt } from "../utils";
+import { type AppOptions, type MSPair, getAppOptions, getMSPairs } from "../5-args";
+import { checkFilenameMaxLen } from "./3-checks";
+import { type ConvertSubtitlesResult, convertSubtitles } from "../1-subs";
 
 export function handleFolders(dirs: string[]) {
     for (let dir of dirs) {
@@ -48,5 +49,34 @@ function oneFileAction(targetFolder: string, shortMp4: string, shortSrt: string,
 
         fs.renameSync(outFullFname, mp4FullFname);
         !appOptions.preserve && rimraf.sync(srtFullFname); // remove it as the last, in case if mp4 is locked by player.
+    }
+}
+
+function preprocessSubtitlesFileFormat(fullFname: string, options: AppOptions): void {
+    const ext = path.extname(fullFname).toLowerCase();
+
+    if (ext !== '.vtt' && ext !== '.srt') {
+        return;
+    }
+
+    const doSrt = ext === '.srt';
+
+    const cnt = fs.readFileSync(fullFname, { encoding: 'utf-8' });
+    let newCnt: ConvertSubtitlesResult = convertSubtitles({ fileContent: cnt, doSrt });
+
+    if (newCnt.hasFixes) { // save if need
+        createBackup(fullFname, options);
+        fs.writeFileSync(fullFname, newCnt.newContent);
+    }
+}
+
+function createBackup(fname: string, options: AppOptions) {
+    if (!options.keepOrg) {
+        return;
+    }
+    const backupName = replaceExt(fname, '.___backup-cc'); // replaceExt(fname, `._${path.extname(fname).substring(2) || ''}`);
+    if (!exist(backupName)) {
+        const cnt = fs.readFileSync(fname, { encoding: 'utf-8' });
+        fs.writeFileSync(backupName, cnt);
     }
 }
