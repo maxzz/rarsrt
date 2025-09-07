@@ -3,17 +3,29 @@ import { type LinesGroup, type LineCnt, LineTypes } from "./9-types";
 import { printLineGroups } from "./8-print-line-groups";
 
 export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGroup[], doSrt: boolean; }): LinesGroup[] {
-    const context: Context = {
+    const ctx: Ctx = {
         hasFixes: false, // TODO: return this value to the caller.
         action: doSrt ? ConvertAction.convertToSrt : ConvertAction.fixAndKeepVtt,
         ccCount: 0,
     };
 
+    /**
+     * ```
+     * // counterlessGroups
+     * [
+     *    {type: 't', lineMulti: '00:00:00,180 --> 00:00:00,510'},
+     *    {type: 'l', lineMulti: 'Okay.'}
+     * ], [
+     *    {type: 't', lineMulti: '00:00:00,510 --> 00:00:05,070'},
+     *    {type: 'l', lineMulti: 'So at this point'}
+     * ]
+    ```
+    */
     const counterlessGroups = lineGroups.map(removeEmptyAndCounter).filter(Boolean);
 
     const newGroups = counterlessGroups.map(
         ([stampLine, textLine], idx) => {
-            correctTimestamp(stampLine, context);
+            correctTimestamp(stampLine, ctx);
 
             const newGroup: LinesGroup = [stampLine, textLine, emptyLine];
             if (doSrt) {
@@ -34,6 +46,22 @@ export function processLineGroups({ lineGroups, doSrt }: { lineGroups: LinesGrou
 
 const emptyLine: LineCnt = { type: LineTypes.empty, lineMulti: '' };
 
+/**
+ * @param linesGroup
+ * ```
+ * [
+ *    {type: '#', line: '1'},
+ *    {type: 't', line: '00:00:00,180 --> 00:00:00,510'},
+ *    {type: 'l', line: 'Okay.'}
+ * ]
+ * @returns
+ * ```
+ [
+    {type: 't', lineMulti: '00:00:00,180 --> 00:00:00,510'},
+    {type: 'l', lineMulti: 'Okay.'}
+ ]
+ ```
+ */
 function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: LineCnt] | undefined {
     // 0. remove the previous counter(s) and remove any empty lines
 
@@ -61,36 +89,41 @@ function removeEmptyAndCounter(linesGroup: LinesGroup): [stamp: LineCnt, text: L
 }
 
 const enum ConvertAction {
-    convertToSrt,   // convert hh:mm:ss.ms to hh:mm:ss,ms fix hh, and extra conter
-    fixAndKeepVtt,  // keep vtt, but fix mm:ss.ms to hh:mm:ss.ms, and extra conter
+    convertToSrt,           // convert hh:mm:ss.ms to hh:mm:ss,ms fix hh, and extra conter
+    fixAndKeepVtt,          // keep vtt, but fix mm:ss.ms to hh:mm:ss.ms, and extra conter
 }
 
-type Context = {
+type Ctx = {
     ccCount: number;
-    hasFixes: boolean;  // file has default hour timestamps (i.e. mm:ss,ms wo/ hh:)
+    hasFixes: boolean;      // file has default hour timestamps (i.e. mm:ss,ms wo/ hh:)
     action: ConvertAction;
 };
 
-function correctTimestamp(stamp: LineCnt, context: Context) {
+/**
+ * Convert timestamp to correct format:
+ *    * '00:05.130 '(vtt) -> '00:05,130 '(srt)
+ *    * (srt/vtt): '00:05,130' -> '00:00:10,350'
+ */
+function correctTimestamp(stamp: LineCnt, ctx: Ctx): void {
     stamp.lineMulti = typeof stamp.lineMulti === 'string' ? fixLIne(stamp.lineMulti) : stamp.lineMulti.map(fixLIne);
 
-    function fixLIne(line: string) {
+    function fixLIne(line: string) { // TODO: This is applied to stamp line which is single line.
         return line.split('-->')
             .map(
-                (leftAndRight) => convertSingleTimestamp(leftAndRight, context)
+                (leftAndRight) => convertSingleTimestamp(leftAndRight, ctx)
             )
             .join(' --> ');
     }
 
 }
 
-function convertSingleTimestamp(timestampStr: string, context: Context): string {
-    if (context.action === ConvertAction.convertToSrt) {
+function convertSingleTimestamp(timestampStr: string, ctx: Ctx): string {
+    if (ctx.action === ConvertAction.convertToSrt) {
         timestampStr = timestampStr.replace('.', ','); // '00:05.130 '(vtt) -> '00:05,130 '(srt)
     }
 
     if (timestampStr.split(":").length < 3) {
-        context.hasFixes = true;
+        ctx.hasFixes = true;
         timestampStr = '00:' + timestampStr.trim(); // (srt/vtt): '00:05,130' -> '00:00:10,350'
     }
 

@@ -2,30 +2,7 @@ import { EOL } from "os";
 import { LineTypes, type LineCnt, type LinesGroup, type SingleLineCnt } from "./9-types";
 
 /**
- * Split into groups to fix counter utilities
- * @param lines 
- * ```
- * [
- *      {type: '#', line: '1'}
- *      {type: 't', line: '00:00:00,180 --> 00:00:00,510'}
- *      {type: 'l', line: 'Okay.'}
- *      {type: 'e', line: ''}
- *      {type: '#', line: '2'}
- *      {type: 't', line: '00:00:00,510 --> 00:00:05,070'}
- * ]
- * ```
- * @returns 
- * ```
- * [
- *    {type: '#', lineMulti: '1'}
- *    {type: 't', lineMulti: '00:00:00,180 --> 00:00:00,510'}
- *    {type: 'l', lineMulti: 'Okay.'}
- * ], [
- *    {type: '#', lineMulti: '2'}
- *    {type: 't', lineMulti: '00:00:00,510 --> 00:00:05,070'}
- *    {type: 'l', lineMulti: 'So at this point'}
- * ],
- *    ```
+ * Split lines into groups to fix counters and remove empty lines.
  */
 export function makeLineGroups(lines: SingleLineCnt[]): LinesGroup[] {
     const rvGroups: LinesGroup[] = [];
