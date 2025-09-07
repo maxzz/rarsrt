@@ -3,7 +3,7 @@ import fs from "fs";
 import rimraf from "rimraf";
 import { exist, ffmpegUtils, LineAnimation, notes, replaceExt } from "../utils";
 import { type AppOptions, type MSPair, getAppOptions, getMSPairs } from "../5-args";
-import { checkFilenameMaxLen } from "./3-checks";
+import { checkFilenameMaxLen } from "./3-check-filename-max-length";
 import { type ConvertSubtitlesResult, convertSubtitles } from "../1-subs";
 
 export function handleFolders(dirs: string[]) {
